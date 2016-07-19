@@ -199,8 +199,6 @@ class LoggerHelper(object):
 
         Parameters
         ----------
-        target: string, optional
-          Which log target to request logger for
         logtarget: { 'stdout', 'stderr', str }, optional
           Where to direct the logs.  stdout and stderr stand for standard streams.
           Any other string is considered a filename.  Multiple entries could be
@@ -211,15 +209,26 @@ class LoggerHelper(object):
         logging.Logger
         """
         # By default mimic previously talkative behavior
-        logtarget = self._get_environ('LOGTARGET', logtarget or 'stderr')
+        self.set_handlers(logtarget)
+        self.set_level()  # set default logging level
+        return self.lgr
 
+    def set_handlers(self, logtarget):
+        # TODO:
+        # wipe out previous handlers from self.lgr
+        socket_path = os.environ.get('DATALAD_SOCKET', None)
+        logtarget = logtarget or \
+                    self._get_environ('LOGTARGET',
+                                      'socket:%s' % socket_path if socket_path else 'stderr')
         # Allow for multiple handlers being specified, comma-separated
-        if ',' in logtarget:
-            for handler_ in logtarget.split(','):
-                self.get_initialized_logger(logtarget=handler_)
-            return self.lgr
+        for handler_ in logtarget.split(','):
+            self._set_handler(logtarget=handler_)
 
-        if logtarget.lower() in ('stdout', 'stderr'):
+    def _set_handler(self, logtarget):
+        if logtarget.startswith('socket:'):
+            socket_path = logtarget.split(':', 1)[-1]
+            loghandler = OurHandler(socket_path)
+        elif logtarget.lower() in ('stdout', 'stderr'):
             loghandler = logging.StreamHandler(getattr(sys, logtarget.lower()))
             use_color = is_interactive()  # explicitly decide here
         else:
@@ -240,7 +249,6 @@ class LoggerHelper(object):
         #  logging.Formatter('%(asctime)-15s %(levelname)-6s %(message)s'))
         self.lgr.addHandler(loghandler)
 
-        self.set_level()  # set default logging level
-        return self.lgr
 
-lgr = LoggerHelper().get_initialized_logger()
+log_helper = LoggerHelper()
+lgr = log_helper.get_initialized_logger()

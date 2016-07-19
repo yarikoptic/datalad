@@ -20,6 +20,11 @@ lgr.log(5, "Instantiating config")
 from .config import ConfigManager
 cfg = ConfigManager()
 
+
+#
+# start_the_ui_server()
+# after DATALAD_SOCKET is defined call  log_helper.set_handlers()
+
 lgr.log(5, "Instantiating ssh manager")
 from .support.sshconnector import SSHManager
 ssh_manager = SSHManager()
