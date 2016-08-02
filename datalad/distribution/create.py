@@ -203,11 +203,11 @@ class Create(Interface):
                 # to be able to track siblings and children
                 repocfg = vcs.repo.config_reader()
                 if repocfg.has_option('annex', 'uuid'):
-                    ds.config.set_value(
+                    ds.config_writer.set_value(
                         'annex',
                         'origin',
                         repocfg.get_value('annex', 'uuid'))
-                    ds.config.release()
+                    ds.config_writer.release()
                     ds.repo.add('.datalad', git=True)
 
             vcs.commit(msg="datalad initial commit",

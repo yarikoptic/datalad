@@ -33,10 +33,9 @@ def get_metadata_type(ds, guess=False):
       Metadata type label or `None` if no type setting is found and and optional
       auto-detection yielded no results
     """
-    cfg = GitConfigParser(opj(ds.path, '.datalad', 'config'),
-                          read_only=True)
-    if cfg.has_section('metadata'):
-        return cfg.get_value('metadata', 'type', default=None)
+    cfg = ds.config
+    if cfg and cfg.has_section('metadata'):
+        return cfg.get_value('metadata', 'nativetype', default=None)
     if guess:
         from . import parsers
         from importlib import import_module

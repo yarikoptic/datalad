@@ -111,6 +111,22 @@ class Dataset(object):
         GitConfigParser
         """
         if self._cfg is None:
+            cfgpath = opj(self.path, '.datalad', 'config')
+            if not exists(cfgpath):
+                return None
+            self._cfg = git.GitConfigParser(cfgpath, read_only=True)
+        return self._cfg
+
+    @property
+    def config_writer(self):
+        """Get an instance of the parser for modifying the persistent dataset
+        configuration.
+
+        Returns
+        -------
+        GitConfigParser
+        """
+        if self._cfg is None:
             cfgpath = opj(self.path, '.datalad')
             if not exists(cfgpath):
                 os.makedirs(cfgpath)
@@ -119,6 +135,7 @@ class Dataset(object):
                 read_only=False,
                 merge_includes=False)
         return self._cfg
+
 
     def register_sibling(self, name, url, publish_url=None, verify=None):
         """Register the location of a sibling dataset under a given name.
