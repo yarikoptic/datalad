@@ -10,7 +10,9 @@
 """
 
 import logging
-from os.path import abspath, join as opj, normpath
+import git
+import os
+from os.path import abspath, join as opj, normpath, exists
 from six import string_types, PY2
 from functools import wraps
 
@@ -53,11 +55,12 @@ def resolve_path(path, ds=None):
 
 
 class Dataset(object):
-    __slots__ = ['_path', '_repo']
+    __slots__ = ['_path', '_repo', '_cfg']
 
     def __init__(self, path):
         self._path = abspath(path)
         self._repo = None
+        self._cfg = None
 
     def __repr__(self):
         return "<Dataset path=%s>" % self.path
@@ -98,6 +101,24 @@ class Dataset(object):
                 # we acquired git-annex branch
                 self._repo = AnnexRepo(self._repo.path, create=False)
         return self._repo
+
+    @property
+    def config(self):
+        """Get an instance of the parser for the persistent dataset configuration.
+
+        Returns
+        -------
+        GitConfigParser
+        """
+        if self._cfg is None:
+            cfgpath = opj(self.path, '.datalad')
+            if not exists(cfgpath):
+                os.makedirs(cfgpath)
+            self._cfg = git.GitConfigParser(
+                opj(cfgpath, 'config'),
+                read_only=False,
+                merge_includes=False)
+        return self._cfg
 
     def register_sibling(self, name, url, publish_url=None, verify=None):
         """Register the location of a sibling dataset under a given name.

@@ -199,10 +199,20 @@ class Create(Interface):
                                 git_opts=git_opts,
                                 annex_opts=annex_opts,
                                 annex_init_opts=annex_init_opts)
+                # record the annex uuid of this repo for this afterlife
+                # to be able to track siblings and children
+                repocfg = vcs.repo.config_reader()
+                if repocfg.has_option('annex', 'uuid'):
+                    ds.config.set_value(
+                        'annex',
+                        'origin',
+                        repocfg.get_value('annex', 'uuid'))
+                    ds.config.release()
+                    ds.repo.add('.datalad', git=True)
 
             vcs.commit(msg="datalad initial commit",
                        options=to_options(allow_empty=True))
-            
+
             return ds
 
     @staticmethod
