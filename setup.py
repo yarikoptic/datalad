@@ -68,6 +68,9 @@ requires = {
         'nose>=1.3.4',
         'testtools',
         'vcrpy',
+    ],
+    'metadata': [
+        'simplejson',
     ]
 }
 requires['full'] = sum(list(requires.values()), [])
