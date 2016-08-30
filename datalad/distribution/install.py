@@ -116,6 +116,7 @@ def get_git_dir(path):
 def _install_subds_from_flexible_source(ds, sm_path, sm_url, recursive):
     """Tries to obtain a given subdataset from several meaningful locations"""
     # shortcut
+    print "HERE"
     vcs = ds.repo
     repo = vcs.repo
     # compose a list of candidate clone URLs
@@ -185,6 +186,8 @@ def _install_subds_from_flexible_source(ds, sm_path, sm_url, recursive):
             # submodule is brand-new and previously unknown
             ds.repo.add_submodule(sm_path, url=clone_url)
         _fixup_submodule_dotgit_setup(ds, sm_path)
+        print("RETURNING")
+        subds._repo = None  # to avoid pickling
         return subds
 
 
@@ -427,9 +430,15 @@ class Install(Interface):
             if recursive:
                 if recursive == "data" and isinstance(ds.repo, AnnexRepo):
                     ds.repo.get('.')
-                for sm in ds.repo.get_submodules():
-                    _install_subds_from_flexible_source(
-                        ds, sm.path, sm.url, recursive=recursive)
+                from datalad.support.async import async
+                _install = async(_install_subds_from_flexible_source)
+                ds._repo = None   # Let's reset to "workaround" pickling issues
+                _install_asyncs = [
+                    _install(ds, sm.path, sm.url, recursive=recursive)
+                    for sm in ds.repo.get_submodules()
+                ]
+                # now just request them to complete
+                [x.get() for x in _install_asyncs]
             return ds
 
         # at this point this dataset is "installed", now we can test whether to
