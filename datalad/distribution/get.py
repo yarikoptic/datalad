@@ -33,6 +33,7 @@ from datalad.support.exceptions import CommandNotAvailableError
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import PathOutsideRepositoryError
 from datalad.dochelpers import exc_str
+from datalad.dochelpers import single_or_plural
 
 from .dataset import Dataset
 from .dataset import EnsureDataset
@@ -243,16 +244,28 @@ class Get(Interface):
         for ds_path in resolved_datasets:
             cur_ds = Dataset(ds_path)
             # needs to be an annex:
-            if not isinstance(cur_ds.repo, AnnexRepo):
-                raise CommandNotAvailableError(
-                    cmd="get", msg="Missing annex at {0}".format(ds))
-
-            lgr.info("Getting {0} files of dataset "
-                     "{1} ...".format(len(resolved_datasets[ds_path]), cur_ds))
-
-            local_results = cur_ds.repo.get(resolved_datasets[ds_path],
-                                            options=['--from=%s' % source]
-                                                     if source else [])
+            resolved_dataset_items = resolved_datasets[ds_path]
+            if isinstance(cur_ds.repo, AnnexRepo):
+                lgr.info("Getting {0} of dataset "
+                         "{1} ...".format(
+                            single_or_plural("item", "items",
+                                             len(resolved_dataset_items),
+                                             include_count=True),
+                            cur_ds))
+                local_results = cur_ds.repo.get(
+                    resolved_dataset_items,
+                    options=['--from=%s' % source]
+                    if source else [])
+            else:
+                if resolved_dataset_items in [['.'], [ds_path]]:
+                    # it was just a wide spec
+                    lgr.info(
+                        "Not getting anything of %s itself since not an annex",
+                        cur_ds.repo.path)
+                    continue
+                else:
+                    raise CommandNotAvailableError(
+                        cmd="get", msg="Missing annex at {0}".format(ds))
 
             # if we recurse into subdatasets, adapt relative paths reported by
             # annex to be relative to the toplevel dataset we operate on:

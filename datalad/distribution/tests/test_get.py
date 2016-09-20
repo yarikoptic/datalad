@@ -11,6 +11,7 @@
 
 
 import logging
+import re
 
 from os import curdir
 from os.path import join as opj
@@ -23,6 +24,7 @@ from datalad.support.exceptions import CommandNotAvailableError
 from datalad.support.exceptions import RemoteNotAvailableError
 from datalad.tests.utils import ok_
 from datalad.tests.utils import eq_
+from datalad.tests.utils import assert_re_in
 from datalad.tests.utils import with_tempfile
 from datalad.tests.utils import with_testrepos
 from datalad.tests.utils import with_tree
@@ -59,6 +61,12 @@ def test_get_invalid_call(path, file_outside):
 
     # get on a plain git:
     assert_raises(CommandNotAvailableError, ds.get, "some.txt")
+    with swallow_logs(new_level=logging.INFO) as cml:
+        # but we don't fail if not annex -- just inform
+        out = ds.get(".")
+        assert_re_in('.*Not getting anything of .*since not an annex',
+                     cml.out, flags=re.DOTALL)
+        eq_(out, [])
 
     # make it an annex:
     AnnexRepo(path, init=True, create=True)
