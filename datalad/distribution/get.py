@@ -248,7 +248,7 @@ class Get(Interface):
             if isinstance(cur_ds.repo, AnnexRepo):
                 lgr.info("Getting {0} of dataset "
                          "{1} ...".format(
-                            single_or_plural("item", "items",
+                            single_or_plural("file/dir", "file/dir(s)",
                                              len(resolved_dataset_items),
                                              include_count=True),
                             cur_ds))
@@ -286,15 +286,27 @@ class Get(Interface):
         if not isinstance(res, list):
             res = [res]
         if not len(res):
-            ui.message("Nothing was getted")
+            ui.message("Got nothing (we have it all already)")
             return
 
-        msg = linesep.join([
-            "{path} ... {suc}".format(
-                suc="ok." if item.get('success', False)
-                    else "failed. (%s)" % item.get('note', 'unknown reason'),
-                path=item.get('file'))
-            for item in res])
+        # provide summary
+        nsuccess = sum(item.get('success', False) for item in res)
+        nfailure = len(res) - nsuccess
+        msg = "Requested %d %s." % (len(res), single_or_plural("file", "files", len(res)))
+        if nsuccess:
+            msg += " Got %d. " % nsuccess
+        if nfailure:
+            msg += " Failed to get %d." % (nfailure,)
         ui.message(msg)
+
+        # if just a few or less than initially explicitly requested
+        if len(res) < 10 or len(res) <= len(args.path):
+            msg = linesep.join([
+                "{path} ... {suc}".format(
+                    suc="ok." if item.get('success', False)
+                        else "failed. (%s)" % item.get('note', 'unknown reason'),
+                    path=item.get('file'))
+                for item in res])
+            ui.message(msg)
 
 
