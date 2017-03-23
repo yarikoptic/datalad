@@ -26,8 +26,11 @@ from os import unlink
 from os.path import join as opj
 from os.path import exists
 from os.path import islink
+from os.path import relpath
+from os.path import normpath
 from os.path import realpath
 from os.path import lexists
+from os.path import isabs
 from os.path import isdir
 from subprocess import Popen, PIPE
 from weakref import WeakValueDictionary
@@ -781,7 +784,7 @@ class AnnexRepo(GitRepo, RepoInterface):
         return expected_downloads, fetch_files
 
     @normalize_paths
-    def add(self, files, git=None, backend=None, options=None, commit=False,
+    def add(self, files, git=None, updates=False, backend=None, options=None, commit=False,
             msg=None, dry_run=False,
             jobs=None,
             git_options=None, annex_options=None, _datalad_msg=False):
@@ -793,6 +796,8 @@ class AnnexRepo(GitRepo, RepoInterface):
           list of paths to add to the annex
         git: bool
           if True, add to git instead of annex.
+        updates: bool
+          if True, pass to git add --update option to add updated files
         commit: bool
           whether or not to directly commit
         msg: str
@@ -823,6 +828,8 @@ class AnnexRepo(GitRepo, RepoInterface):
         # `git` parameter and call GitRepo's add() instead.
         if dry_run:
             git_options = ['--dry-run', '-N', '--ignore-missing']
+            if updates:
+                git_options += ['--update']
 
             # add to git instead of annex
             if self.is_direct_mode():
@@ -838,19 +845,23 @@ class AnnexRepo(GitRepo, RepoInterface):
                 #           files
                 #self.cmd_call_wrapper.run(cmd_list, expect_stderr=True)
             else:
-                return_list = super(AnnexRepo, self).add(files, git_options=git_options)
+                return_list = super(AnnexRepo, self).add(
+                    files, updates=True, git_options=git_options)
         else:
             # Theoretically we could have done for git as well, if it could have
             # been batched
             # Call git annex add for any to have full control of either to go
             # to git or to anex
             # 1. Figure out what actually will be added
-            to_be_added_recs = self.add(files, git=True, dry_run=True)
+            to_be_added_recs = self.add(files, git=True, dry_run=True, updates=updates)
             # collect their sizes for the progressbar
             expected_additions = {
                 rec['file']: self.get_file_size(rec['file'])
                 for rec in to_be_added_recs
             }
+            if updates:
+                # overload files with what was deduced
+                files = [rec['file'] for rec in to_be_added_recs]
 
             # if None -- leave it to annex to decide
             if git is not None:
@@ -862,15 +873,21 @@ class AnnexRepo(GitRepo, RepoInterface):
                     # to maintain behaviour similar to git
                     options += ['--include-dotfiles']
 
-            return_list = list(self._run_annex_command_json(
-                'add',
-                args=options + files,
-                backend=backend,
-                expect_fail=True,
-                jobs=jobs,
-                expected_entries=expected_additions,
-                expect_stderr=True
-            ))
+            if updates and not files:
+                # annex would add untracked files if no paths provided
+                lgr.debug("Not running annex add since we are in --updates mode and "
+                          "there were no files with updates.")
+                return_list = []
+            else:
+                return_list = list(self._run_annex_command_json(
+                    'add',
+                    args=options + files,
+                    backend=backend,
+                    expect_fail=True,
+                    jobs=jobs,
+                    expected_entries=expected_additions,
+                    expect_stderr=True
+                ))
 
         if commit:
             if msg is None:
@@ -1718,7 +1735,7 @@ class AnnexRepo(GitRepo, RepoInterface):
             self._batched.close()
         super(AnnexRepo, self).precommit()
 
-    def commit(self, msg=None, options=None, _datalad_msg=False):
+    def commit(self, msg=None, options=None, files=None, updates=False, _datalad_msg=False):
         """
 
         Parameters
@@ -1726,20 +1743,26 @@ class AnnexRepo(GitRepo, RepoInterface):
         msg: str
         options: list of str
           cmdline options for git-commit
+        updates: bool, optional
         """
+        # XXX temp -- check if we caught all use cases of options to pass paths
+        for opt in options or []:
+            if not opt.startswith('-'):
+                raise ValueError
         self.precommit()
+        if files is None:
+            # I can please so good
+            files = []
         if self.is_direct_mode():
-            # committing explicitly given paths in direct mode via proxy used to
-            # fail, because absolute paths are used. Using annex proxy this
-            # leads to an error (path outside repository)
-            if options:
-                for i in range(len(options)):
-                    if not options[i].startswith('-'):
-                        # an option, that is not an option => it's a path
-                        # TODO: comprehensive + have dedicated parameter 'files'
-                        from os.path import isabs, relpath, normpath
-                        if isabs(options[i]):
-                            options[i] = normpath(relpath(options[i], start=self.path))
+            if updates:
+                options = assure_list(options)
+                options += ['-a']  # -a is for 'all updates' for commit
+                files = []  # see comment within GitRepo.commit
+            else:
+                # committing explicitly given paths in direct mode via proxy used to
+                # fail, because absolute paths are used. Using annex proxy this
+                # leads to an error (path outside repository)
+                files = [normpath(relpath(p, start=self.path)) for p in files if isabs(p)]
 
             if _datalad_msg:
                 msg = self._get_prefixed_commit_msg(msg)
@@ -1751,9 +1774,13 @@ class AnnexRepo(GitRepo, RepoInterface):
                     options = ["--allow-empty-message"]
 
             self.proxy(['git', 'commit'] + (['-m', msg] if msg else []) +
-                       (options if options else []), expect_stderr=True)
+                       (options if options else []) + files,
+                       expect_stderr=True)
         else:
-            super(AnnexRepo, self).commit(msg, options, _datalad_msg=_datalad_msg)
+            super(AnnexRepo, self).commit(
+                msg, options=options, files=files,
+                updates=updates, _datalad_msg=_datalad_msg
+            )
 
     @normalize_paths(match_return_type=False)
     def remove(self, files, force=False, **kwargs):

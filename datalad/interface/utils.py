@@ -210,7 +210,9 @@ def save_dataset_hierarchy(
         info,
         base=None,
         message='[DATALAD] saved changes',
-        version_tag=None):
+        version_tag=None,
+        all_updated=False
+):
     """Save (disjoint) hierarchies of datasets.
 
     Saving is done in an order that guarantees that all to be saved
@@ -226,6 +228,8 @@ def save_dataset_hierarchy(
       Common super dataset that should also be saved.
     message : str
       Message to be used for saving individual datasets
+    all_updated : bool
+      Save all updated files
 
     Returns
     -------
@@ -260,7 +264,9 @@ def save_dataset_hierarchy(
                 ds,
                 info[dpath],
                 message=message,
-                version_tag=version_tag)
+                version_tag=version_tag,
+                all_updated=all_updated
+            )
             if saved_state:
                 saved.append(ds)
     return saved
@@ -270,7 +276,9 @@ def save_dataset(
         ds,
         paths=None,
         message=None,
-        version_tag=None):
+        version_tag=None,
+        all_updated=False
+):
     """Save changes in a single dataset.
 
     Parameters
@@ -291,7 +299,6 @@ def save_dataset(
       no new state will be saved.
     """
     # XXX paths must be in the given ds, no further sanity checks!
-
     # make sure that all pending changes (batched annex operations, etc.)
     # are actually reflected in Git
     ds.repo.precommit()
@@ -300,12 +307,12 @@ def save_dataset(
     # possible to decide when/what to save further down
     # and one level up
     orig_hexsha = ds.repo.get_hexsha()
-
     # always yields list; empty if None
     files = list(
         set(
             [opj(ds.path, f) if not isabs(f) else f for f in assure_list(paths)]))
 
+    #import pdb; pdb.set_trace()
     # try to consider existing and changed files, and prevent untracked
     # files from being added
     # XXX not acting upon untracked files would be very expensive, because
@@ -317,18 +324,16 @@ def save_dataset(
     # unlocked files in a v5 repo are listed as "typechange" and commit
     # refuses to touch them without an explicit `add`
     tostage = [f for f in files if lexists(f)]
-    if tostage:
-        lgr.debug('staging files for commit: %s', tostage)
-        if isinstance(ds.repo, AnnexRepo):
-            # to make this work without calling `git add` in addition,
-            # this needs git-annex v6.20161210 (see #1027)
-            ds.repo.add(tostage, commit=False)
-        else:
-            # --update will ignore any untracked files, sadly git-annex add
-            # above does not
-            # will complain about vanished files though, filter them here, but
-            # keep them for a later commit call
-            ds.repo.add(tostage, git_options=['--update'], commit=False)
+
+    if all_updated:
+        # we just add what was updated!
+        lgr.debug('staging only updated stuff for the commit.')
+        staged = ds.repo.add([], updates=all_updated, commit=False)
+        lgr.debug('staged %s updated items', len(staged))
+    elif tostage:
+        lgr.debug('staging %d files for commit. First 10: %s',
+                  len(tostage), tostage[:10])
+        ds.repo.add(tostage, commit=False)
 
     _datalad_msg = False
     if not message:
@@ -339,7 +344,7 @@ def save_dataset(
             index=True,
             working_tree=False,
             untracked_files=False,
-            submodules=True):
+            submodules=True) or all_updated:
         # either we have an explicit list of files, or we have something
         # stages otherwise do not attempt to commit, as the underlying
         # repo will happily commit any non-change
@@ -355,8 +360,11 @@ def save_dataset(
             # a repo in whatever mode is dirty
             # however, if nothing is dirty the whining wil start
             # --> sucking it up right here
-            with swallow_logs(new_level=logging.ERROR) as cml:
-                ds.repo.commit(message, options=files, _datalad_msg=_datalad_msg)
+            #with swallow_logs(new_level=logging.ERROR) as cml:
+            if True:
+                print("committing ", message, files)
+                ds.repo.commit(message, files=files, updates=all_updated,
+                               _datalad_msg=_datalad_msg)
         except CommandError as e:
             # TODO until #1171 is resolved, test here for "normal" failure
             # to commit
@@ -382,7 +390,7 @@ def save_dataset(
     return ds.repo.repo.head.commit if _was_modified else None
 
 
-def amend_pathspec_with_superdatasets(spec, topmost=True, limit_single=False):
+def get_pathspecs_for_superdatasets(spec, topmost=True, limit_single=False):
     """Amend a path spec dictionary with entries for superdatasets
 
     The result will be a superdataset entry (if a superdataset exists)
@@ -406,7 +414,7 @@ def amend_pathspec_with_superdatasets(spec, topmost=True, limit_single=False):
     Returns
     -------
     dict
-      Amended path spec dictionary
+      spec for super-datasets "pass"
     """
     superdss = {}
     for dpath in spec.keys():
@@ -434,8 +442,7 @@ def amend_pathspec_with_superdatasets(spec, topmost=True, limit_single=False):
             spaths = spec.get(superds.path, [])
         spaths.append(dpath)
         superdss[superds.path] = spaths
-    spec.update(superdss)
-    return spec
+    return superdss
 
 
 def get_paths_by_dataset(paths, recursive=False, recursion_limit=None,
@@ -646,7 +653,7 @@ def get_dataset_directories(top, ignore_datalad=True):
 
 
 # XXX the following present a different approach to
-# amend_pathspec_with_superdatasets() for discovering datasets between
+# get_pathspecs_for_superdatasets() for discovering datasets between
 # processed ones and a base
 # let it simmer for a while and RF to use one or the other
 # this one here seems more leightweight and less convoluted
@@ -679,7 +686,7 @@ def filter_unmodified(content_by_ds, refds, since):
 
     This function takes a path specification dictionary, as produced by
     `Interface._prep()` and filters it such that only that subset of paths
-    remains in the dictionary that corresponding to the set of changes in
+    remains in the dictionary that corresponds to the set of changes in
     the given reference dataset since a given state.
 
     The change set is traced across all related subdatasets, i.e. if a submodule
@@ -696,7 +703,7 @@ def filter_unmodified(content_by_ds, refds, since):
     Parameters
     ----------
     content_by_ds : dict
-      Per-dataset path specifications, as produced ,for example, by
+      Per-dataset path specifications, as produced, for example, by
       `Interface._prep()`
     refds : Dataset or *Repo or path
       Reference dataset for which to determine the initial change set

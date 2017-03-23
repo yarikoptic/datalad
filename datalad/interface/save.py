@@ -25,7 +25,7 @@ from datalad.interface.common_opts import recursion_limit, recursion_flag
 from datalad.interface.common_opts import super_datasets_flag
 from datalad.interface.common_opts import save_message_opt
 from datalad.interface.utils import save_dataset_hierarchy
-from datalad.interface.utils import amend_pathspec_with_superdatasets
+from datalad.interface.utils import get_pathspecs_for_superdatasets
 from datalad.utils import with_pathsep as _with_sep
 from datalad.utils import get_dataset_root
 
@@ -116,7 +116,9 @@ class Save(Interface):
         all_updated=Parameter(
             args=("-u", "--all-updated"),
             doc="""save changes of all known components in datasets that contain
-            any of the given paths.""",
+            any of the given paths. Note, that if file names to specific files
+            within datasets provided, updated files might be get changed
+            (echoing git's behavior)""",
             action="store_true"),
         version_tag=Parameter(
             args=("--version-tag",),
@@ -156,6 +158,7 @@ class Save(Interface):
         if unavailable_paths:
             lgr.warning("ignoring non-existent path(s): %s",
                         unavailable_paths)
+
         # here we know all datasets associated with any inputs
         # so we can expand "all_updated" right here to avoid confusion
         # wrt to "super" and "intermediate" datasets discovered later on
@@ -163,29 +166,66 @@ class Save(Interface):
             # and we do this by replacing any given paths with the respective
             # datasets' base path
             for ds in content_by_ds:
-                content_by_ds[ds] = [ds]
+                content_by_ds[ds] = []
 
+        content_by_dss = [(content_by_ds, {'all_updated': all_updated})]
         if super_datasets:
-            content_by_ds = amend_pathspec_with_superdatasets(
+            content_by_ds_supers = get_pathspecs_for_superdatasets(
                 content_by_ds,
                 # save up to and including the base dataset (if one is given)
                 # otherwise up to the very top
                 topmost=dataset if dataset else True,
                 limit_single=False)
+            content_by_dss.append((content_by_ds_supers, {}))
 
-        if dataset:
-            # stuff all paths also into the base dataset slot to make sure
-            # we get all links between relevant subdatasets
-            bp = content_by_ds.get(dataset.path, [])
-            for c in content_by_ds:
-                bp.extend(content_by_ds[c])
-            content_by_ds[dataset.path] = list(set(bp))
+        # TODO: this one is not yet "proper" since now with logic below
+        # to ignore paths if add_updated, we can't instruct in one
+        # pass to save all updated and
+        """I am concluding that "save" is a mess and largely because noone
+        ever formalized how it should behave, so it behaves as it should.
 
-        saved_ds = save_dataset_hierarchy(
-            content_by_ds,
-            base=dataset.path if dataset and dataset.is_installed() else None,
-            message=message,
-            version_tag=version_tag)
+        But what should 'save .' do?  I have initiated a new spreadsheet within
+        API Use-cases convergence.  May be it would clear up if we actually
+        need/want to have -u at all! ;-)
+
+        Reliance on git/annex to do the right thing while we do not pass down
+        flags to process updates had, as I have reported, various
+        side-effects. I have grown my own abomination diff while introducing
+        few clear although 'strict' assumptions (e.g. having '-u' implies no
+        separate paths being saved) but that would then require double pass
+        to accomplish e.g. `-r -u` "properly" and thus also would introduce
+        complicated logic.    The whole chain should be refactored imho,
+        with approach similar to ongoing 'return values' RF where down the
+        stream not just 'content_by_ds' is passed but what needs to be done
+        with it, or besides it (e.g. "add all modified", "add specified
+        paths", "commit", "tag").
+2
+        Complications are also for providing correct
+        return values  -- e.g. output of git add -u --dry-run is not sufficient
+        (staged files aren't listed), so probably, if generator like behavior
+        is desired, we could do
+
+        git status --porcelain | grep -v '?? and other eg deleted' | git annex add --batch --json
+        and yield those
+
+        """
+        for content_by_ds, kwargs in content_by_dss:
+            if dataset:
+                # stuff all paths also into the base dataset slot to make sure
+                # we get all links between relevant subdatasets
+                # yoh:  "not sure!"
+                bp = content_by_ds.get(dataset.path, [])
+                for c in content_by_ds:
+                    bp.extend(content_by_ds[c])
+                content_by_ds[dataset.path] = list(set(bp))
+
+            saved_ds = save_dataset_hierarchy(
+                content_by_ds,
+                base=dataset.path if dataset and dataset.is_installed() else None,
+                message=message,
+                version_tag=version_tag,
+                **
+            )
 
         return saved_ds
 

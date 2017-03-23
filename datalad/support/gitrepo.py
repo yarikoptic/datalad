@@ -751,7 +751,9 @@ class GitRepo(RepoInterface):
         return msg + '\n\nFiles:\n' + '\n'.join(files)
 
     @normalize_paths
-    def add(self, files, commit=False, msg=None, git=True, git_options=None, _datalad_msg=False):
+    def add(self, files, commit=False, msg=None, git=True,
+            updates=False,
+            git_options=None, _datalad_msg=False):
         """Adds file(s) to the repository.
 
         Parameters
@@ -766,6 +768,8 @@ class GitRepo(RepoInterface):
         git: bool
           somewhat ugly construction to be compatible with AnnexRepo.add();
           has to be always true.
+        updates: bool
+          to add all updated files
         """
 
         # needs to be True - see docstring:
@@ -773,13 +777,16 @@ class GitRepo(RepoInterface):
 
         files = _remove_empty_items(files)
         out = []
+        git_options = assure_list(git_options)
+        if updates:
+            git_options += ['--update']
 
-        if files:
+        if files or updates:
             try:
                 # without --verbose git 2.9.3  add does not return anything
                 add_out = self._git_custom_command(
                     files,
-                    ['git', 'add'] + assure_list(git_options) + ['--verbose']
+                    ['git', 'add'] + git_options + ['--verbose']
                 )
                 # get all the entries
                 out = self._process_git_get_output(*add_out)
@@ -806,7 +813,7 @@ class GitRepo(RepoInterface):
                 raise
 
         else:
-            lgr.warning("add was called with empty file list.")
+            lgr.warning("add was called with empty file list and no additional options.")
 
         if commit:
             if msg is None:
@@ -883,7 +890,7 @@ class GitRepo(RepoInterface):
         DATALAD_PREFIX = "[DATALAD]"
         return DATALAD_PREFIX if not msg else "%s %s" % (DATALAD_PREFIX, msg)
 
-    def commit(self, msg=None, options=None, _datalad_msg=False):
+    def commit(self, msg=None, options=None, files=None, updates=False, _datalad_msg=False):
         """Commit changes to git.
 
         Parameters
@@ -892,10 +899,17 @@ class GitRepo(RepoInterface):
           commit-message
         options: list of str
           cmdline options for git-commit
+        updates: bool, optional
+          commit with '-u' for committing updated files
         _datalad_msg: bool, optional
           To signal that commit is automated commit by datalad, so
           it would carry the [DATALAD] prefix
         """
+        # to please mih... what are those few cpu cicles -- our datalad is super fast anyways!
+        if files is None:
+            files = []
+        if options is None:
+            options = []
 
         if _datalad_msg:
             msg = self._get_prefixed_commit_msg(msg)
@@ -908,10 +922,22 @@ class GitRepo(RepoInterface):
                     options = ["--allow-empty-message"]
 
         self.precommit()
-        if options:
+        if updates:
+            options = assure_list(options)
+            options += ['-a']
+            # git add -u  PATHS  ignores -u
+            # git commit -a PATHS  crashes stating it makes no sense
+            # in our case we still channel some bogus paths pointing to datasets
+            # around so I have changed the logic that having '-u' flag means
+            # to ignore specific files paths and commit updates
+            if files:
+                lgr.debug("Ignoring passed %d paths because requested to commit updates", len(files))
+            files = []
+
+        if options or files:
             # we can't pass all possible options to gitpython's implementation
             # of commit. Therefore we need a direct call to git:
-            cmd = ['git', 'commit'] + (["-m", msg if msg else ""]) + options
+            cmd = ['git', 'commit'] + (["-m", msg if msg else ""]) + options + files
             lgr.debug("Committing via direct call of git: %s" % cmd)
             self._git_custom_command([], cmd)
         else:
