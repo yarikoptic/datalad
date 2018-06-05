@@ -19,8 +19,12 @@ from six.moves.urllib.parse import urlparse
 
 from .base import NoneAuthenticator, NotImplementedAuthenticator
 
-from .http import HTMLFormAuthenticator, HTTPBasicAuthAuthenticator, HTTPDigestAuthAuthenticator
-from .http import HTTPDownloader
+from .http import (
+    HTMLFormAuthenticator, HTTPBasicAuthAuthenticator,
+    HTTPDigestAuthAuthenticator,
+    HTTPBearerTokenAuthenticator,
+    HTTPDownloader,
+)
 from .s3 import S3Authenticator, S3Downloader
 from ..support.configparserinc import SafeConfigParserWithIncludes
 from ..support.external_versions import external_versions
@@ -36,6 +40,7 @@ AUTHENTICATION_TYPES = {
     'http_auth': HTTPBasicAuthAuthenticator,
     'http_basic_auth': HTTPBasicAuthAuthenticator,
     'http_digest_auth': HTTPDigestAuthAuthenticator,
+    'bearer_token': HTTPBearerTokenAuthenticator,
     'aws-s3': S3Authenticator,  # TODO: check if having '-' is kosher
     'nda-s3': S3Authenticator,
     'xnat': NotImplementedAuthenticator,
