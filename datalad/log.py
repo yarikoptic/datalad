@@ -197,7 +197,8 @@ class ProgressHandler(logging.Handler):
 
 class NoProgressLog(logging.Filter):
     def filter(self, record):
-        return not hasattr(record, 'dlm_progress')
+        return not hasattr(record, 'dlm_progress') \
+               or hasattr(record, 'dlm_progress_logme')
 
 
 class OnlyProgressLog(logging.Filter):
@@ -233,6 +234,10 @@ def log_progress(lgrcall, pid, *args, **kwargs):
         {'dlm_progress_{}'.format(n): v for n, v in kwargs.items()
          if v},
         dlm_progress=pid)
+    if not set(kwargs).intersection({'update', 'incremental', 'label', 'total'}):
+        # Final progress message or error, should be allowed to get through
+        # the NoProgressLog
+        d['dlm_progress_logme'] = True
     lgrcall(*args, extra=d)
 
 
