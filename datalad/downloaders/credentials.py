@@ -302,9 +302,29 @@ class NDA_S3(CompositeCredential):
     _CREDENTIAL_ADAPTERS = (_nda_adapter,)
 
 
+def _loris_adapter(user=None, password=None, **kwargs):
+    from datalad.support.third.loris_token_generator import LORISTokenGenerator
+
+    gen = LORISTokenGenerator(url=_loris_adapter.url)
+    token = gen.generate_token(user, password)
+
+    return dict(token=token)
+
+class LORIS_Token(CompositeCredential):
+    _CREDENTIAL_CLASSES = (UserPassword, Token)
+    _CREDENTIAL_ADAPTERS = (_loris_adapter,)
+
+    def __init__(self, name, url=None, keyring=None):
+        super(CompositeCredential, self).__init__(name, url, keyring)
+        # Hack to get the URL passed to _loris_adapter
+        _loris_adapter.url = url
+
+
+
 CREDENTIAL_TYPES = {
     'user_password': UserPassword,
     'aws-s3': AWS_S3,
     'nda-s3': NDA_S3,
     'token': Token,
+    'loris-token': LORIS_Token
 }
