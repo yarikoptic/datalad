@@ -183,7 +183,7 @@ class ProgressHandler(logging.Handler):
             # not an update -> done
             # TODO if the other logging that is happening is less frontpage
             # we may want to actually "print" the completion message
-            self.pbars.pop(pid).finish()
+            self.pbars.pop(pid).finish(clear=True)
         else:
             # an update
             self.pbars[pid].update(
