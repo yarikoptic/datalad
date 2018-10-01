@@ -1618,7 +1618,8 @@ class AnnexRepo(GitRepo, RepoInterface):
             for that file
         """
 
-        if len(files) > 1:
+        from inspect import isgenerator
+        if isgenerator(files) or len(files) > 1:
             return self._batched.get('lookupkey', path=self.path)(files)
         else:
             files = files[0]
@@ -3588,12 +3589,12 @@ class BatchedAnnex(object):
         if not self._process:
             self._initialize()
 
-        input_multiple = isinstance(cmds, list)
+        from inspect import isgenerator
+        input_multiple = isinstance(cmds, list) or isgenerator(cmds)
         if not input_multiple:
             cmds = [cmds]
 
         output = []
-
         for entry in cmds:
             if not isinstance(entry, string_types):
                 entry = ' '.join(entry)
@@ -3619,9 +3620,9 @@ class BatchedAnnex(object):
             if stderr:
                 lgr.warning("Received output in stderr: %r", stderr)
             lgr.log(5, "Received output: %r" % stdout)
-            output.append(stdout)
+            yield stdout # output.append(stdout)
 
-        return output if input_multiple else output[0]
+        #return output if input_multiple else output[0]
 
     def __del__(self):
         self.close()

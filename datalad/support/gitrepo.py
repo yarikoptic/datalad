@@ -18,6 +18,7 @@ import shlex
 import time
 import os
 import os.path as op
+from inspect import isgenerator
 from os import linesep
 from os.path import join as opj
 from os.path import exists
@@ -274,7 +275,11 @@ def normalize_paths(func, match_return_type=True, map_filenames_back=False,
             else lambda rpath, filepath: filepath
 
         if files:
-            if isinstance(files, string_types) or not files:
+            generator = False
+            if isgenerator(files):
+                generator = True
+                files_new = (normalize(self.path, path) for path in files)
+            elif isinstance(files, string_types) or not files:
                 files_new = [normalize(self.path, files)]
                 single_file = True
             elif isinstance(files, list):
@@ -308,7 +313,12 @@ def normalize_paths(func, match_return_type=True, map_filenames_back=False,
                 for f in files_new
             ]
         else:
-            result = func(self, files_new, *args, **kwargs)
+            if generator:
+                return (
+                    result for result in func(self, files_new, *args, **kwargs)
+                )
+            else:
+                result = func(self, files_new, *args, **kwargs)
 
         if single_file is None:
             # no files were provided, nothing we can do really
