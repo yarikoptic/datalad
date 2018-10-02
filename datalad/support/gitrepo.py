@@ -313,13 +313,13 @@ def normalize_paths(func, match_return_type=True, map_filenames_back=False,
                 for f in files_new
             ]
         else:
-            if generator:
-                return (
-                    result for result in func(self, files_new, *args, **kwargs)
-                )
-            else:
-                result = func(self, files_new, *args, **kwargs)
-
+            result = func(self, files_new, *args, **kwargs)
+            if isgenerator(result):
+                if generator:
+                    return result
+                else:
+                    # For consistency with previous behavior
+                    result = list(result)
         if single_file is None:
             # no files were provided, nothing we can do really
             return result
