@@ -33,6 +33,12 @@ RESULT_STATUS_COLORS = {
     'error': RED
 }
 
+STATE_COLOR_MAP = {
+    'untracked': RED,
+    'modified': RED,
+    'added': GREEN,
+}
+
 # Aliases for uniform presentation
 
 DATASET = UNDERLINE

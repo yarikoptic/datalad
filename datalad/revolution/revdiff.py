@@ -196,7 +196,7 @@ class RevDiff(Interface):
             fill=' ' * max(0, max_len - len(state)),
             state=ac.color_word(
                 state,
-                ut.state_color_map.get(res['state'], ac.WHITE)),
+                ac.STATE_COLOR_MAP.get(res['state'], ac.WHITE)),
             path=path,
             type_=' ({})'.format(
                 ac.color_word(type_, ac.MAGENTA) if type_ else '')))
