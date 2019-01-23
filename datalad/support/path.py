@@ -17,6 +17,7 @@ import os.path as op
 
 from functools import wraps
 from itertools import dropwhile
+from six import PY2
 
 from ..utils import (
     assure_bytes,
@@ -56,6 +57,19 @@ pathsep = op.pathsep
 relpath = op.relpath
 realpath = _get_unicode_robust_version(op.realpath)
 sep = op.sep
+
+# handle this dance once, and import pathlib from here
+# in all other places
+if PY2:
+    from pathlib2 import (
+        Path,
+        PurePosixPath,
+    )
+else:
+    from pathlib import (
+        Path,
+        PurePosixPath,
+    )
 
 
 def robust_abspath(p):

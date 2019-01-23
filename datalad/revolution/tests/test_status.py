@@ -9,7 +9,7 @@
 
 import os.path as op
 from six import text_type
-from ..utils import Path
+from datalad.support.path import Path
 
 from datalad.utils import (
     chpwd,

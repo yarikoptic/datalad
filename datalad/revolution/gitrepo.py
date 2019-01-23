@@ -19,7 +19,7 @@ from datalad.utils import (
 )
 
 from datalad.dochelpers import exc_str
-from .utils import (
+from datalad.support.path import (
     Path,
     PurePosixPath,
 )

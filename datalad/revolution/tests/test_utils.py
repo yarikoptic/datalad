@@ -18,7 +18,7 @@ from ..dataset import (
     resolve_path,
 )
 
-from ..utils import Path
+from datalad.support.path import Path
 
 
 @with_tempfile(mkdir=True)

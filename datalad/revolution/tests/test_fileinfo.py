@@ -9,7 +9,7 @@
 
 import os.path as op
 
-from ..utils import (
+from datalad.support.path import (
     Path,
     PurePosixPath,
 )

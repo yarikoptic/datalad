@@ -10,7 +10,7 @@ from six import (
 import wrapt
 from weakref import WeakValueDictionary
 import logging
-from .utils import Path
+from datalad.support.path import Path
 
 from datalad.distribution.dataset import (
     Dataset as _Dataset,

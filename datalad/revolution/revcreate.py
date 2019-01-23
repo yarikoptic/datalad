@@ -51,7 +51,7 @@ from .revsave import RevSave
 
 from .gitrepo import RevolutionGitRepo as GitRepo
 from .annexrepo import RevolutionAnnexRepo as AnnexRepo
-from .utils import Path
+from datalad.support.path import Path
 
 
 __docformat__ = 'restructuredtext'

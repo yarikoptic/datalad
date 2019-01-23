@@ -14,7 +14,7 @@ from datalad.utils import (
 )
 from datalad.ui import ui
 
-from .utils import (
+from datalad.support.path import (
     Path,
     PurePosixPath,
 )

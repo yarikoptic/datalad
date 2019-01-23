@@ -40,7 +40,7 @@ from .dataset import (
     path_under_dataset,
     get_dataset_root,
 )
-from .utils import Path
+from datalad.support.path import Path
 
 from .revdiff import (
     RevDiff,

@@ -23,7 +23,7 @@ from datalad.tests.utils import (
     SkipTest,
 )
 
-from ..utils import (
+from datalad.support.path import (
     Path,
     PurePosixPath,
 )

@@ -35,7 +35,7 @@ from datalad.tests.utils import (
 )
 from datalad.distribution.tests.test_add import tree_arg
 
-from ..utils import Path
+from datalad.support.path import Path
 from ..dataset import RevolutionDataset as Dataset
 from ..annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.api import (

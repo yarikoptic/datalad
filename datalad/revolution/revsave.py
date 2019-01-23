@@ -38,7 +38,7 @@ from datalad.support.exceptions import CommandError
 from datalad.utils import (
     assure_list,
 )
-from .utils import Path
+from datalad.support.path import Path
 
 from .dataset import (
     RevolutionDataset as Dataset,

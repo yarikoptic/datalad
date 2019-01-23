@@ -35,7 +35,7 @@ from datalad.tests.utils import (
     assert_result_count,
 )
 
-from ..utils import Path
+from datalad.support.path import Path
 from ..dataset import RevolutionDataset as Dataset
 from datalad.api import (
     rev_save as save,
