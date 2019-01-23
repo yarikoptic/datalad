@@ -8,7 +8,11 @@
 """Test file info getters"""
 
 import os.path as op
-from .. import utils as ut
+
+from ..utils import (
+    Path,
+    PurePosixPath,
+)
 
 from datalad.tests.utils import (
     with_tempfile,
@@ -38,7 +42,7 @@ def test_get_content_info(path):
     repopath = ds.repo.pathobj
 
     assert_equal(ds.repo.pathobj, repopath)
-    assert_equal(ds.pathobj, ut.Path(path))
+    assert_equal(ds.pathobj, Path(path))
 
     # verify general rules on fused info records that are incrementally
     # assembled: for git content info, amended with annex info on 'HEAD'
@@ -92,7 +96,7 @@ def test_get_content_info(path):
         for s in ('untracked', 'added', 'deleted', 'clean',
                   'ingit_clean', 'dropped_clean', 'modified',
                   'ingit_modified'):
-            for l in ('', ut.PurePosixPath('subdir', '')):
+            for l in ('', PurePosixPath('subdir', '')):
                 if t == 'subds' and 'ingit' in s or 'dropped' in s:
                     # invalid combination
                     continue
@@ -112,7 +116,7 @@ def test_get_content_info(path):
         for s in ('untracked', 'added', 'deleted', 'clean',
                   'ingit_clean', 'dropped_clean', 'modified',
                   'ingit_modified'):
-            for l in ('', ut.PurePosixPath('subdir', '')):
+            for l in ('', PurePosixPath('subdir', '')):
                 p = repopath.joinpath(l, '{}_{}'.format(t, s))
                 if s in ('untracked', 'ingit_clean', 'ingit_modified'):
                     # annex knows nothing about these things

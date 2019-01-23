@@ -10,7 +10,7 @@ from six import (
 import wrapt
 from weakref import WeakValueDictionary
 import logging
-from . import utils as ut
+from .utils import Path
 
 from datalad.distribution.dataset import (
     Dataset as _Dataset,
@@ -46,7 +46,7 @@ class RevolutionDataset(_Dataset):
         """pathobj for the dataset"""
         # XXX this relies on the assumption that self._path as managed
         # by the base class is always a native path
-        return ut.Path(self._path)
+        return Path(self._path)
 
     @property
     def repo(self):
@@ -199,7 +199,7 @@ def resolve_path(path, ds=None):
         ds = require_dataset(ds, check_installed=False, purpose='path resolution')
     if ds is None:
         # CWD is the reference
-        path = ut.Path(path)
+        path = Path(path)
     # we have a dataset
     # stringify in case a pathobj came in
     elif not op.isabs(str(path)) and \
@@ -210,7 +210,7 @@ def resolve_path(path, ds=None):
         path = ds.pathobj / path
     else:
         # CWD is the reference
-        path = ut.Path(path)
+        path = Path(path)
 
     # make sure we return an absolute path, but without actually
     # resolving anything
@@ -228,8 +228,8 @@ def resolve_path(path, ds=None):
         # are intellectual excercises
         # ALGORITHM: match any number of leading '..' path components
         # and shorten the PWD by that number
-        # NOT using ut.Path.cwd(), because it has symlinks resolved!!
-        pwd_parts = ut.Path(getpwd()).parts
+        # NOT using Path.cwd(), because it has symlinks resolved!!
+        pwd_parts = Path(getpwd()).parts
         path_parts = path.parts
         leading_parents = 0
         for p in path.parts:
@@ -242,7 +242,7 @@ def resolve_path(path, ds=None):
                 path_parts = path_parts[1:]
             else:
                 break
-        path = ut.Path(
+        path = Path(
             op.join(
                 *(pwd_parts[:-leading_parents if leading_parents else None]
                   + path_parts)))
@@ -255,7 +255,7 @@ def resolve_path(path, ds=None):
 def path_under_dataset(ds, path):
     ds_path = ds.pathobj
     try:
-        rpath = text_type(ut.Path(path).relative_to(ds_path))
+        rpath = text_type(Path(path).relative_to(ds_path))
         if not rpath.startswith(op.pardir):
             # path is already underneath the dataset
             return path

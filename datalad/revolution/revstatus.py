@@ -40,7 +40,7 @@ from .dataset import (
     path_under_dataset,
     get_dataset_root,
 )
-from . import utils as ut
+from .utils import Path
 
 from .revdiff import (
     RevDiff,
@@ -242,7 +242,7 @@ class RevStatus(Interface):
                             # as a whole (in the superdataset)
                             root = super_root
 
-                root = ut.Path(root)
+                root = Path(root)
                 ps = paths_by_ds.get(root, [])
                 ps.append(p)
                 paths_by_ds[root] = ps

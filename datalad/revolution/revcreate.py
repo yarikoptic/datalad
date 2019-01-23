@@ -51,7 +51,7 @@ from .revsave import RevSave
 
 from .gitrepo import RevolutionGitRepo as GitRepo
 from .annexrepo import RevolutionAnnexRepo as AnnexRepo
-from . import utils as ut
+from .utils import Path
 
 
 __docformat__ = 'restructuredtext'
@@ -245,7 +245,7 @@ class RevCreate(Interface):
             op.normpath(op.join(str(path), os.pardir)))
         if parentds_path:
             prepo = GitRepo(parentds_path)
-            parentds_path = ut.Path(parentds_path)
+            parentds_path = Path(parentds_path)
             # we cannot get away with a simple
             # GitRepo.get_content_info(), as we need to detect
             # uninstalled/added subdatasets too
@@ -253,8 +253,8 @@ class RevCreate(Interface):
                 parentds_path / k.relative_to(prepo.path)
                 for k, v in iteritems(prepo.status(untracked='no'))
                 if v.get('type', None) == 'dataset'}
-            check_paths = [ut.Path(path)]
-            check_paths.extend(ut.Path(path).parents)
+            check_paths = [Path(path)]
+            check_paths.extend(Path(path).parents)
             if any(p in subds_status for p in check_paths):
                 conflict = [p for p in check_paths if p in subds_status]
                 res.update({
@@ -297,7 +297,7 @@ class RevCreate(Interface):
                 git_opts=initopts,
                 fake_dates=fake_dates)
             # place a .noannex file to indicate annex to leave this repo alone
-            stamp_path = ut.Path(tbrepo.path) / '.noannex'
+            stamp_path = Path(tbrepo.path) / '.noannex'
             stamp_path.touch()
             add_to_git[stamp_path] = {
                 'type': 'file',

@@ -19,7 +19,10 @@ from datalad.utils import (
 )
 
 from datalad.dochelpers import exc_str
-from . import utils as ut
+from .utils import (
+    Path,
+    PurePosixPath,
+)
 from datalad.support.gitrepo import (
     GitRepo,
     InvalidGitRepositoryError,
@@ -47,7 +50,7 @@ class RevolutionGitRepo(GitRepo):
         # native path object to the instance
         # XXX this relies on the assumption that self.path as managed
         # by the base class is always a native path
-        self.pathobj = ut.Path(self.path)
+        self.pathobj = Path(self.path)
 
     def _create_empty_repo(self, path, **kwargs):
         cmd = ['git', 'init']
@@ -146,7 +149,7 @@ class RevolutionGitRepo(GitRepo):
             # and Git always reports POSIX paths
             # any incoming path has to be relative already, so we can simply
             # convert unconditionally
-            paths = [ut.PurePosixPath(p) for p in paths]
+            paths = [PurePosixPath(p) for p in paths]
 
         # this will not work in direct mode, but everything else should be
         # just fine
@@ -199,17 +202,17 @@ class RevolutionGitRepo(GitRepo):
             props = props_re.match(line)
             if not props:
                 # not known to Git, but Git always reports POSIX
-                path = ut.PurePosixPath(line)
+                path = PurePosixPath(line)
                 inf['gitshasum'] = None
             else:
                 # again Git reports always in POSIX
-                path = ut.PurePosixPath(props.group(4))
+                path = PurePosixPath(props.group(4))
                 inf['gitshasum'] = props.group(2 if not ref else 3)
                 inf['type'] = mode_type_map.get(
                     props.group(1), props.group(1))
                 if inf['type'] == 'symlink' and \
                         '.git/annex/objects' in \
-                        ut.Path(
+                        Path(
                             op.realpath(op.join(
                                 # this is unicode
                                 self.path,
@@ -344,7 +347,7 @@ class RevolutionGitRepo(GitRepo):
         if paths:
             # at this point we must normalize paths to the form that
             # Git would report them, to easy matching later on
-            paths = [ut.Path(p) for p in paths]
+            paths = [Path(p) for p in paths]
             paths = [
                 p.relative_to(self.pathobj) if p.is_absolute() else p
                 for p in paths
@@ -371,7 +374,7 @@ class RevolutionGitRepo(GitRepo):
                 modified = _cache[key]
             else:
                 modified = set(
-                    self.pathobj.joinpath(ut.PurePosixPath(p))
+                    self.pathobj.joinpath(PurePosixPath(p))
                     for p in self._git_custom_command(
                         # low-level code cannot handle pathobjs
                         [str(p) for p in paths] if paths else None,
@@ -666,7 +669,7 @@ class RevolutionGitRepo(GitRepo):
                 yield get_status_dict(
                     action='add_submodule',
                     ds=self,
-                    path=self.pathobj / ut.PurePosixPath(cand_sm),
+                    path=self.pathobj / PurePosixPath(cand_sm),
                     status='error',
                     message=e.stderr if hasattr(e, 'stderr')
                     else ('not a Git repository: %s', exc_str(e)),
@@ -696,7 +699,7 @@ class RevolutionGitRepo(GitRepo):
                         action=r.get('command', 'add'),
                         refds=self.pathobj,
                         type='file',
-                        path=(self.pathobj / ut.PurePosixPath(r['file']))
+                        path=(self.pathobj / PurePosixPath(r['file']))
                         if 'file' in r else None,
                         status='ok' if r.get('success', None) else 'error',
                         key=r.get('key', None),
@@ -727,7 +730,7 @@ class RevolutionGitRepo(GitRepo):
                     action=r.get('command', 'add'),
                     refds=self.pathobj,
                     type='file',
-                    path=(self.pathobj / ut.PurePosixPath(r['file']))
+                    path=(self.pathobj / PurePosixPath(r['file']))
                     if 'file' in r else None,
                     status='ok' if r.get('success', None) else 'error',
                     key=r.get('key', None),

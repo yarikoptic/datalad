@@ -18,7 +18,7 @@ from ..dataset import (
     resolve_path,
 )
 
-from .. import utils as ut
+from ..utils import Path
 
 
 @with_tempfile(mkdir=True)
@@ -47,9 +47,9 @@ def test_resolve_path(path):
             # also resolve `opath`, as on old windows systems the path might
             # come in crippled (e.g. C:\Users\MIKE~1/...)
             # and comparison would fails unjustified
-            eq_(resolve_path('.').resolve(), ut.Path(opath).resolve())
+            eq_(resolve_path('.').resolve(), Path(opath).resolve())
             # no norming, but absolute paths, without resolving links
-            eq_(resolve_path('.'), ut.Path(d))
+            eq_(resolve_path('.'), Path(d))
             eq_(str(resolve_path('.')), d)
 
             eq_(str(resolve_path(op.join(os.curdir, 'bu'), ds=ds_global)),
@@ -71,7 +71,7 @@ def test_resolve_path(path):
 # under any circumstances
 @with_tempfile(mkdir=True)
 def test_resolve_path_symlink_edition(path):
-    deepest = ut.Path(path) / 'one' / 'two' / 'three'
+    deepest = Path(path) / 'one' / 'two' / 'three'
     deepest_str = str(deepest)
     os.makedirs(deepest_str)
     with chpwd(deepest_str):

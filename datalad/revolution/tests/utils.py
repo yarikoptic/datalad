@@ -23,7 +23,10 @@ from datalad.tests.utils import (
     SkipTest,
 )
 
-from .. import utils as ut
+from ..utils import (
+    Path,
+    PurePosixPath,
+)
 
 
 def assert_repo_status(path, annex=None, untracked_mode='normal', **kwargs):
@@ -91,7 +94,7 @@ def assert_repo_status(path, annex=None, untracked_mode='normal', **kwargs):
     status = r.status(untracked=untracked_mode)
     # for any file state that indicates some kind of change (all but 'clean)
     for state in ('added', 'untracked', 'deleted', 'modified'):
-        oktobefound = sorted(r.pathobj.joinpath(ut.PurePosixPath(p))
+        oktobefound = sorted(r.pathobj.joinpath(PurePosixPath(p))
                              for p in kwargs.get(state, []))
         state_files = sorted(k for k, v in iteritems(status)
                              if v.get('state', None) == state)
@@ -282,8 +285,8 @@ def get_deeply_nested_structure(path):
             'file_modified': 'file_modified',
         }
     )
-    (ut.Path(subds.path) / 'subdir').mkdir()
-    (ut.Path(subds.path) / 'subdir' / 'annexed_file.txt').write_text(u'dummy')
+    (Path(subds.path) / 'subdir').mkdir()
+    (Path(subds.path) / 'subdir' / 'annexed_file.txt').write_text(u'dummy')
     subds.rev_save()
     (ds.pathobj / 'directory_untracked').mkdir()
     # symlink farm #1
@@ -301,14 +304,14 @@ def get_deeply_nested_structure(path):
     (ds.pathobj / 'link2subdsdir').symlink_to(
         op.join('subds_modified', 'subdir'))
     # symlink to a dir in a superdataset (across dataset boundaries)
-    (ut.Path(subds.path) / 'link2superdsdir').symlink_to(
+    (Path(subds.path) / 'link2superdsdir').symlink_to(
         op.join('..', 'subdir'))
     return ds
 
 
 def has_symlink_capability():
     try:
-        wdir = ut.Path(tempfile.mkdtemp())
+        wdir = Path(tempfile.mkdtemp())
         (wdir / 'target').touch()
         (wdir / 'link').symlink_to(wdir / 'target')
         return True

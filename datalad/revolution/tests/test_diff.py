@@ -35,7 +35,7 @@ from datalad.tests.utils import (
     assert_result_count,
 )
 
-from .. import utils as ut
+from ..utils import Path
 from ..dataset import RevolutionDataset as Dataset
 from datalad.api import (
     rev_save as save,
@@ -74,14 +74,14 @@ def test_repo_diff(path, norepo):
     ds.rev_save(to_git=True)
     assert_repo_status(ds.path)
     eq_(ds.repo.diff(fr='HEAD~1', to='HEAD'),
-        {ut.Path(ds.repo.pathobj / 'new'): {
+        {Path(ds.repo.pathobj / 'new'): {
             'state': 'added',
             'type': 'file',
             'gitshasum': '7b4d68d70fcae134d5348f5e118f5e9c9d3f05f6'}})
     # modify known file
     create_tree(ds.path, {'new': 'notempty'})
     eq_(ds.repo.diff(fr='HEAD', to=None),
-        {ut.Path(ds.repo.pathobj / 'new'): {
+        {Path(ds.repo.pathobj / 'new'): {
             'state': 'modified',
             'type': 'file',
             # the beast is modified, but no change in shasum -> not staged
@@ -105,16 +105,16 @@ def test_repo_diff(path, norepo):
     # default is to report all files
     eq_(ds.repo.diff(fr='HEAD', to=None),
         {
-            ut.Path(ds.repo.pathobj / 'deep' / 'down'): {
+            Path(ds.repo.pathobj / 'deep' / 'down'): {
                 'state': 'untracked',
                 'type': 'file'},
-            ut.Path(ds.repo.pathobj / 'deep' / 'down2'): {
+            Path(ds.repo.pathobj / 'deep' / 'down2'): {
                 'state': 'untracked',
                 'type': 'file'}})
     # but can be made more compact
     eq_(ds.repo.diff(fr='HEAD', to=None, untracked='normal'),
         {
-            ut.Path(ds.repo.pathobj / 'deep'): {
+            Path(ds.repo.pathobj / 'deep'): {
                 'state': 'untracked',
                 'type': 'directory'}})
 
@@ -123,10 +123,10 @@ def test_repo_diff(path, norepo):
     # perfect match and anything underneath will do
     eq_(ds.repo.diff(fr='HEAD', to=None, paths=['deep']),
         {
-            ut.Path(ds.repo.pathobj / 'deep' / 'down'): {
+            Path(ds.repo.pathobj / 'deep' / 'down'): {
                 'state': 'untracked',
                 'type': 'file'},
-            ut.Path(ds.repo.pathobj / 'deep' / 'down2'): {
+            Path(ds.repo.pathobj / 'deep' / 'down2'): {
                 'state': 'untracked',
                 'type': 'file'}})
 
@@ -302,7 +302,7 @@ def test_path_diff(_path, linkpath):
     ds = get_deeply_nested_structure(str(_path))
     if has_symlink_capability():
         # make it more complicated by default
-        ut.Path(linkpath).symlink_to(_path, target_is_directory=True)
+        Path(linkpath).symlink_to(_path, target_is_directory=True)
         path = linkpath
     else:
         path = _path

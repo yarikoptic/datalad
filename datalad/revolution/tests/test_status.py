@@ -9,12 +9,13 @@
 
 import os.path as op
 from six import text_type
-from .. import utils as ut
+from ..utils import Path
 
 from datalad.utils import (
     chpwd,
     on_windows,
 )
+
 from datalad.tests.utils import (
     eq_,
     assert_in,
@@ -55,7 +56,7 @@ def test_runnin_on_empty(path):
 def test_status_basics(path, linkpath, otherdir):
     if not on_windows:
         # make it more complicated by default
-        ut.Path(linkpath).symlink_to(path, target_is_directory=True)
+        Path(linkpath).symlink_to(path, target_is_directory=True)
         path = linkpath
 
     with chpwd(path):
@@ -108,7 +109,7 @@ def test_status(_path, linkpath):
     ds = get_deeply_nested_structure(str(_path))
     if has_symlink_capability():
         # make it more complicated by default
-        ut.Path(linkpath).symlink_to(_path, target_is_directory=True)
+        Path(linkpath).symlink_to(_path, target_is_directory=True)
         path = linkpath
     else:
         path = _path

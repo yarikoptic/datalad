@@ -41,7 +41,10 @@ from .dataset import (
     path_under_dataset,
     get_dataset_root,
 )
-from . import utils as ut
+from .utils import (
+    Path,
+    PurePosixPath,
+)
 
 from datalad.support.constraints import (
     EnsureNone,
@@ -188,7 +191,7 @@ class RevDiff(Interface):
         refds = refds if kwargs.get('dataset', None) is not None \
             or refds == os.getcwd() else None
         path = res['path'] if refds is None \
-            else str(ut.Path(res['path']).relative_to(refds))
+            else str(Path(res['path']).relative_to(refds))
         type_ = res.get('type', res.get('type_src', ''))
         max_len = len('untracked')
         state = res['state']

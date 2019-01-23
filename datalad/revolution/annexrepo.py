@@ -14,7 +14,10 @@ from datalad.utils import (
 )
 from datalad.ui import ui
 
-from . import utils as ut
+from .utils import (
+    Path,
+    PurePosixPath,
+)
 
 from datalad.support.annexrepo import AnnexRepo
 from datalad.support.exceptions import CommandError
@@ -61,9 +64,9 @@ class RevolutionAnnexRepo(AnnexRepo, RevolutionGitRepo):
                     # just the containing dir, as on windows the latter
                     # may not always get cleaned up on `drop`
                     objectstore.joinpath(
-                        ut.Path(r['hashdirmixed']), key, key),
+                        Path(r['hashdirmixed']), key, key),
                     objectstore.joinpath(
-                        ut.Path(r['hashdirlower']), key, key)):
+                        Path(r['hashdirlower']), key, key)):
                 if testpath.exists():
                     r.pop('hashdirlower', None)
                     r.pop('hashdirmixed', None)
@@ -138,7 +141,7 @@ class RevolutionAnnexRepo(AnnexRepo, RevolutionGitRepo):
             opts.extend([str(p) for p in paths]
                         if paths else ['--include', '*'])
         for j in self._run_annex_command_json(cmd, opts=opts):
-            path = self.pathobj.joinpath(ut.PurePosixPath(j['file']))
+            path = self.pathobj.joinpath(PurePosixPath(j['file']))
             rec = info.get(path, None)
             if init is not None and rec is None:
                 # init constraint knows nothing about this path -> skip

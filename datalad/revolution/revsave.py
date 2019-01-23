@@ -38,7 +38,7 @@ from datalad.support.exceptions import CommandError
 from datalad.utils import (
     assure_list,
 )
-from . import utils as ut
+from .utils import Path
 
 from .dataset import (
     RevolutionDataset as Dataset,
@@ -191,7 +191,7 @@ class RevSave(Interface):
             # fish out status dict for this parent dataset
             ds_status = paths_by_ds.get(s['parentds'], {})
             # reassemble path status info as repo.status() would have made it
-            ds_status[ut.Path(s['path'])] = \
+            ds_status[Path(s['path'])] = \
                 {k: v for k, v in iteritems(s)
                  if k not in (
                      'path', 'parentds', 'refds', 'status', 'action',
@@ -219,7 +219,7 @@ class RevSave(Interface):
                 for subds in subdss:
                     # TODO actually start from an entry that may already
                     # exist in the status record
-                    superds_status[ut.Path(subds)] = dict(
+                    superds_status[Path(subds)] = dict(
                         # shot from the hip, some status config
                         # to trigger this specific super/sub
                         # relation to be saved

@@ -35,7 +35,7 @@ from datalad.tests.utils import (
 )
 from datalad.distribution.tests.test_add import tree_arg
 
-from .. import utils as ut
+from ..utils import Path
 from ..dataset import RevolutionDataset as Dataset
 from ..annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.api import (
@@ -338,7 +338,7 @@ def test_add_files(path):
             for a in assure_list(arg[0]):
                 assert_result_count(result, 1, path=str(ds.pathobj / a))
             status = ds.repo.get_content_annexinfo(
-                ut.Path(p) for p in assure_list(arg[0]))
+                Path(p) for p in assure_list(arg[0]))
         for f, p in iteritems(status):
             if arg[1]:
                 assert p.get('key', None) is None, f
@@ -458,7 +458,7 @@ def test_gh1597_simpler(path):
     # no annex key, not in annex
     assert_not_in(
         'key',
-        ds.repo.get_content_annexinfo([ut.Path(attrfile)]).popitem()[1])
+        ds.repo.get_content_annexinfo([Path(attrfile)]).popitem()[1])
 
 
 @with_tempfile(mkdir=True)
