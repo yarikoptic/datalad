@@ -48,6 +48,7 @@ from datalad.support.constraints import (
     EnsureStr,
     EnsureChoice,
 )
+import datalad.support.ansi_colors as ac
 from datalad.support.param import Parameter
 from datalad.consts import PRE_INIT_COMMIT_SHA
 
@@ -193,12 +194,12 @@ class RevDiff(Interface):
         state = res['state']
         ui.message('{fill}{state}: {path}{type_}'.format(
             fill=' ' * max(0, max_len - len(state)),
-            state=ut.ac.color_word(
+            state=ac.color_word(
                 state,
-                ut.state_color_map.get(res['state'], ut.ac.WHITE)),
+                ut.state_color_map.get(res['state'], ac.WHITE)),
             path=path,
             type_=' ({})'.format(
-                ut.ac.color_word(type_, ut.ac.MAGENTA) if type_ else '')))
+                ac.color_word(type_, ac.MAGENTA) if type_ else '')))
 
 
 def _diff_cmd(
