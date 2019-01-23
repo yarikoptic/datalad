@@ -8,7 +8,10 @@ import logging
 from six import iteritems
 from weakref import WeakValueDictionary
 
-from datalad.utils import on_windows
+from datalad.utils import (
+    nothere,
+    on_windows,
+)
 from datalad.ui import ui
 
 from . import utils as ut
@@ -227,4 +230,4 @@ class RevolutionAnnexRepo(AnnexRepo, RevolutionGitRepo):
 # remove deprecated methods from API
 for m in obsolete_methods + gitrepo_obsolete_methods:
     if hasattr(RevolutionAnnexRepo, m):
-        setattr(RevolutionAnnexRepo, m, ut.nothere)
+        setattr(RevolutionAnnexRepo, m, nothere)

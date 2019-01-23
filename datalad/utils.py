@@ -206,6 +206,10 @@ def is_interactive():
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
 
 
+def nothere(*args, **kwargs):
+    raise NotImplementedError
+
+
 def get_ipython_shell():
     """Detect if running within IPython and returns its `ip` (shell) object
 

@@ -13,7 +13,10 @@ from six import (
 )
 from weakref import WeakValueDictionary
 
-from datalad.utils import assure_list
+from datalad.utils import (
+    assure_list,
+    nothere,
+)
 
 from datalad.dochelpers import exc_str
 from . import utils as ut
@@ -764,4 +767,4 @@ class RevolutionGitRepo(GitRepo):
 # remove deprecated methods from API
 for m in obsolete_methods:
     if hasattr(RevolutionGitRepo, m):
-        setattr(RevolutionGitRepo, m, ut.nothere)
+        setattr(RevolutionGitRepo, m, nothere)

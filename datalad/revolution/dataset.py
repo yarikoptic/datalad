@@ -24,6 +24,7 @@ from datalad.support.gitrepo import (
 )
 
 from datalad.utils import (
+    nothere,
     optional_args,
     getpwd,
 )
@@ -93,7 +94,7 @@ class RevolutionDataset(_Dataset):
 
 
 # remove deprecated method from API
-setattr(RevolutionDataset, 'get_subdatasets', ut.nothere)
+setattr(RevolutionDataset, 'get_subdatasets', nothere)
 
 
 @optional_args

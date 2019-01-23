@@ -20,7 +20,3 @@ state_color_map = {
     'modified': ac.RED,
     'added': ac.GREEN,
 }
-
-
-def nothere(*args, **kwargs):
-    raise NotImplementedError
