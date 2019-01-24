@@ -24,17 +24,9 @@ from datalad.support.exceptions import CommandError
 
 from .gitrepo import (
     RevolutionGitRepo,
-    obsolete_methods as gitrepo_obsolete_methods,
 )
 
 lgr = logging.getLogger('datalad.revolution.annexrepo')
-
-obsolete_methods = (
-    # next two are only needed by 'ok_clean_git'
-    # 'untracked_files',
-    # 'get_status',
-    'is_dirty',
-)
 
 
 class RevolutionAnnexRepo(AnnexRepo, RevolutionGitRepo):
@@ -228,9 +220,3 @@ class RevolutionAnnexRepo(AnnexRepo, RevolutionGitRepo):
                 expected_entries=expected_additions,
                 expect_stderr=True):
             yield r
-
-
-# remove deprecated methods from API
-for m in obsolete_methods + gitrepo_obsolete_methods:
-    if hasattr(RevolutionAnnexRepo, m):
-        setattr(RevolutionAnnexRepo, m, nothere)

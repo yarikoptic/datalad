@@ -33,6 +33,7 @@ from os.path import pardir
 from os.path import sep
 import posixpath
 from functools import wraps
+import warnings
 from weakref import WeakValueDictionary
 
 
@@ -2189,7 +2190,8 @@ class GitRepo(RepoInterface):
         -------
           bool
         """
-
+        warnings.warn("GitRepo.is_dirty is obsolete; use dirty instead",
+                      category=DeprecationWarning)
         return self.repo.is_dirty(index=index, working_tree=working_tree,
                                   untracked_files=untracked_files,
                                   submodules=submodules, path=path)

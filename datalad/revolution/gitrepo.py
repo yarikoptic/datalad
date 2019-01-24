@@ -33,10 +33,6 @@ from datalad.interface.results import get_status_dict
 
 lgr = logging.getLogger('datalad.revolution.gitrepo')
 
-obsolete_methods = (
-    'is_dirty',
-)
-
 
 class RevolutionGitRepo(GitRepo):
 
@@ -765,9 +761,3 @@ class RevolutionGitRepo(GitRepo):
             if props.get('state', None) != 'clean' and
             # -core ignores empty untracked directories, so shall we
             not (p.is_dir() and len(list(p.iterdir())) == 0)]) > 0
-
-
-# remove deprecated methods from API
-for m in obsolete_methods:
-    if hasattr(RevolutionGitRepo, m):
-        setattr(RevolutionGitRepo, m, nothere)

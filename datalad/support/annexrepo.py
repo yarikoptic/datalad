@@ -35,6 +35,7 @@ from os.path import relpath
 from os.path import normpath
 from subprocess import Popen, PIPE
 from multiprocessing import cpu_count
+import warnings
 from weakref import WeakValueDictionary
 
 from six import string_types, PY2
@@ -533,6 +534,8 @@ class AnnexRepo(GitRepo, RepoInterface):
         -------
 
         """
+        warnings.warn("AnnexRepo.get_status is obsolete; use status instead",
+                      category=DeprecationWarning)
 
         self.precommit()
 
@@ -594,6 +597,9 @@ class AnnexRepo(GitRepo, RepoInterface):
     @borrowdoc(GitRepo)
     def is_dirty(self, index=True, working_tree=False, untracked_files=True,
                  submodules=True, path=None):
+        warnings.warn("AnnexRepo.is_dirty is obsolete; use dirty instead",
+                      category=DeprecationWarning)
+
         # TODO: Add doc on how this differs from GitRepo.is_dirty()
         # Parameter working_tree exists to meet the signature of GitRepo.is_dirty()
 
@@ -624,6 +630,9 @@ class AnnexRepo(GitRepo, RepoInterface):
     def untracked_files(self):
         """Get a list of untracked files
         """
+        warnings.warn(
+            "AnnexRepo.untracked_files is obsolete; use status instead",
+            category=DeprecationWarning)
         return self.get_status(untracked=True, deleted=False, modified=False,
                                added=False, type_changed=False, submodules=False,
                                path=None)['untracked']
