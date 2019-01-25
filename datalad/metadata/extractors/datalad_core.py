@@ -18,7 +18,7 @@ from os.path import join as opj
 from os.path import exists
 
 from datalad.support.json_py import load as jsonload
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.coreapi import subdatasets
 # use main version as core version
 # this must stay, despite being a seemingly unused import, each extractor defines a version

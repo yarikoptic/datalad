@@ -8,7 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Tests for the universal datalad's annex customremote"""
 
-from ...support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ...consts import DATALAD_SPECIAL_REMOTE
 from ...tests.utils import *
 

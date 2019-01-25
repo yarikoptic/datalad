@@ -39,7 +39,7 @@ from datalad.support.constraints import EnsureChoice
 from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureNone
 from datalad.support.param import Parameter
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.gitrepo import (
     GitRepo,
     _fixup_submodule_dotgit_setup,

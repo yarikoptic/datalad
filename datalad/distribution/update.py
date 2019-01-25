@@ -22,7 +22,7 @@ from datalad.interface.base import build_doc
 from datalad.interface.results import get_status_dict
 from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureNone
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.param import Parameter
 from datalad.interface.annotate_paths import AnnotatePaths
 from datalad.interface.common_opts import recursion_flag

@@ -241,7 +241,7 @@ def test_runner_heavy_output():
 
 @with_tempfile(mkdir=True)
 def test_runner_failure(dir_):
-    from ..support.annexrepo import AnnexRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
     repo = AnnexRepo(dir_, create=True)
     runner = Runner()
     failing_cmd = ['git-annex', 'add', 'notexistent.dat']
@@ -263,7 +263,7 @@ def test_runner_failure_unicode(path):
 
 @with_tempfile(mkdir=True)
 def test_git_path(dir_):
-    from ..support.gitrepo import GitRepo
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
     # As soon as we use any GitRepo we should get _GIT_PATH set in the Runner
     repo = GitRepo(dir_, create=True)
     assert GitRunner._GIT_PATH is not None

@@ -13,7 +13,7 @@ from os.path import join as opj, basename
 from datalad.api import create
 from datalad.api import install
 from datalad.api import siblings
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.exceptions import InsufficientArgumentsError
 
 from datalad.tests.utils import chpwd

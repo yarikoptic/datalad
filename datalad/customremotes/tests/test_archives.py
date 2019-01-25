@@ -22,7 +22,7 @@ from ..archives import (
     link_file_load,
 )
 from ..base import AnnexExchangeProtocol
-from ...support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ...consts import ARCHIVES_SPECIAL_REMOTE
 from .test_base import (
     BASE_INTERACTION_SCENARIOS,

@@ -22,8 +22,8 @@ from datalad.utils import chpwd, getpwd, rmtree
 from datalad.utils import _path_
 from datalad.utils import get_dataset_root
 from datalad.utils import on_windows
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
 from nose.tools import ok_, eq_, assert_false, assert_equal, assert_true, \
     assert_is_instance, assert_is_none, assert_is_not, assert_is_not_none

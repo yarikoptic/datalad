@@ -36,7 +36,7 @@ from datalad.interface.common_opts import recursion_limit
 from datalad.distribution.dataset import Dataset
 from datalad.distribution.dataset import require_dataset
 from datalad.cmd import GitRunner
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.utils import _path_
 from datalad.utils import path_startswith
 from datalad.utils import assure_list

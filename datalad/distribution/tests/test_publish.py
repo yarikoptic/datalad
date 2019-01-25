@@ -21,8 +21,8 @@ from datalad.api import publish, install
 from datalad.api import install
 from datalad.api import create
 from datalad.dochelpers import exc_str
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import IncompleteResultsError
 from datalad.utils import chpwd

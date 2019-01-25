@@ -22,10 +22,10 @@ from datalad.utils import knows_annex
 from datalad.utils import rmtree
 from datalad.utils import chpwd
 from datalad.support.gitrepo import (
-    GitRepo,
     GitCommandError,
 )
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
 from nose.tools import eq_, assert_false, assert_is_instance, ok_
 from datalad.tests.utils import with_tempfile, assert_in, \

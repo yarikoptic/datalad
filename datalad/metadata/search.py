@@ -37,7 +37,7 @@ from datalad.interface.utils import eval_results
 from datalad.distribution.dataset import Dataset
 from datalad.distribution.dataset import datasetmethod, EnsureDataset, \
     require_dataset
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.param import Parameter
 from datalad.support.constraints import EnsureNone
 from datalad.support.constraints import EnsureInt

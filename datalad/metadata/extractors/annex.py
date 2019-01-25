@@ -14,7 +14,7 @@ import logging
 lgr = logging.getLogger('datalad.metadata.extractors.annexmeta')
 from datalad.log import log_progress
 
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 # use main version as core version
 # this must stay, despite being a seemingly unused import, each extractor defines a version
 from datalad.metadata.definitions import version as vocabulary_version

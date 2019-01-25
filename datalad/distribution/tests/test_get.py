@@ -20,7 +20,7 @@ from datalad.api import get
 from datalad.api import install
 from datalad.interface.results import only_matching_paths
 from datalad.distribution.get import _get_flexible_source_candidates_for_submodule
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import RemoteNotAvailableError
 from datalad.tests.utils import ok_

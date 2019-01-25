@@ -47,10 +47,10 @@ from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureNone
 from datalad.support.param import Parameter
 from datalad.support.gitrepo import (
-    GitRepo,
     InvalidGitRepositoryError,
 )
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import CommandError
 

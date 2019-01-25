@@ -1493,7 +1493,7 @@ def knows_annex(path):
     if not exists(path):
         lgr.debug("No annex: test path {0} doesn't exist".format(path))
         return False
-    from datalad.support.gitrepo import GitRepo
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
     return GitRepo(path, init=False, create=False).is_with_annex()
 
 

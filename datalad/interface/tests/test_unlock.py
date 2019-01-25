@@ -20,7 +20,7 @@ from datalad.api import create
 from datalad.api import unlock
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import CommandError
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.tests.utils import with_tempfile
 from datalad.tests.utils import assert_raises
 from datalad.tests.utils import eq_

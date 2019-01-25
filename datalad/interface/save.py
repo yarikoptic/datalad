@@ -21,7 +21,7 @@ from os.path import lexists
 
 from datalad.utils import assure_unicode
 from datalad.utils import unique
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureNone
 from datalad.support.param import Parameter

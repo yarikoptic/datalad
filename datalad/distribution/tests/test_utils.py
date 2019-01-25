@@ -14,7 +14,7 @@ from os.path import join as opj
 
 from datalad.distribution.utils import _get_flexible_source_candidates
 
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 
 from datalad.tests.utils import with_tempfile
 from datalad.tests.utils import eq_

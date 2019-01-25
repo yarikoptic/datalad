@@ -14,8 +14,8 @@ from abc import ABCMeta, abstractmethod
 from six import add_metaclass
 from os.path import dirname, join as opj, exists, pardir
 
-from ..support.gitrepo import GitRepo
-from ..support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ..cmd import Runner
 from ..support.network import get_local_file_url
 from ..support.external_versions import external_versions

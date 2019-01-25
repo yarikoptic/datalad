@@ -171,7 +171,7 @@ def test_our_metadataset_search(tdir):
 
 @with_tempfile
 def test_search_non_dataset(tdir):
-    from datalad.support.gitrepo import GitRepo
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
     GitRepo(tdir, create=True)
     with assert_raises(NoDatasetArgumentFound) as cme:
         list(search('smth', dataset=tdir))

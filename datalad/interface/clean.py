@@ -19,7 +19,7 @@ from ..consts import ARCHIVES_TEMP_DIR
 from ..consts import ANNEX_TEMP_DIR
 from ..consts import SEARCH_INDEX_DOTGITDIR
 
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.constraints import EnsureNone
 from datalad.distribution.dataset import EnsureDataset
 from datalad.distribution.dataset import require_dataset

@@ -96,14 +96,14 @@ from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import AnnexBatchCommandError
 from datalad.support.exceptions import IncompleteResultsError
 
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 
 # imports from same module:
 from datalad.support.annexrepo import (
-    AnnexRepo,
     ProcessAnnexProgressIndicators,
     _get_size_from_perc_complete,
 )
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from .utils import check_repo_deals_with_inode_change
 
 

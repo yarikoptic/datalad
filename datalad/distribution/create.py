@@ -36,8 +36,8 @@ from datalad.support.constraints import EnsureNone
 from datalad.support.constraints import EnsureKeyChoice
 from datalad.support.constraints import EnsureDType
 from datalad.support.param import Parameter
-from datalad.support.annexrepo import AnnexRepo
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.utils import getpwd
 from datalad.utils import get_dataset_root
 

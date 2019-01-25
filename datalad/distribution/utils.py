@@ -19,8 +19,7 @@ import posixpath
 
 from six.moves.urllib.parse import unquote as urlunquote
 
-from datalad.support.annexrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.network import DataLadRI
 from datalad.support.network import URL
 from datalad.support.network import RI

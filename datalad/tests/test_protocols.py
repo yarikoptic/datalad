@@ -20,7 +20,7 @@ from nose.tools import ok_, eq_, assert_is, assert_equal, assert_greater, \
 from ..support.protocol import DryRunProtocol, DryRunExternalsProtocol, \
     NullProtocol, ExecutionTimeProtocol, ExecutionTimeExternalsProtocol, \
     ProtocolInterface
-from ..support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from ..cmd import Runner
 from .utils import with_tempfile
 from .utils import swallow_logs

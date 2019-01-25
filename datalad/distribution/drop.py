@@ -22,7 +22,7 @@ from datalad.utils import assure_list
 from datalad.support.param import Parameter
 from datalad.support.constraints import EnsureStr, EnsureNone
 from datalad.support.exceptions import InsufficientArgumentsError
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.distribution.dataset import Dataset, EnsureDataset, \
     datasetmethod
 from datalad.interface.annotate_paths import AnnotatePaths

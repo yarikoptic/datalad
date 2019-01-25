@@ -42,8 +42,8 @@ from datalad.tests.utils import swallow_logs
 from datalad.tests.utils import assert_re_in
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.exceptions import NoDatasetArgumentFound
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
 from nose.tools import assert_true, assert_equal, assert_raises
 

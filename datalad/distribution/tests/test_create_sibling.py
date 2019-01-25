@@ -23,8 +23,8 @@ from datalad.api import publish, install, create_sibling
 from datalad.cmd import Runner
 from datalad.utils import chpwd
 from datalad.tests.utils import create_tree
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.network import urlquote
 from nose.tools import eq_, assert_false
 from datalad.tests.utils import with_tempfile, assert_in, \

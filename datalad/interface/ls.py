@@ -36,8 +36,8 @@ from ..distribution.dataset import Dataset
 
 from datalad.distribution.subdatasets import Subdatasets
 
-from datalad.support.annexrepo import AnnexRepo
-from datalad.support.annexrepo import GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.utils import is_interactive
 
 from logging import getLogger

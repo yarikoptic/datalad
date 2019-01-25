@@ -772,6 +772,9 @@ class AnnexRepo(GitRepo, RepoInterface):
     def is_valid_repo(cls, path, allow_noninitialized=False):
         """Return True if given path points to an annex repository
         """
+        # TODO(revolution): Remove once RevolutionGitRepo is absorbed.
+        from datalad.revolution.gitrepo import RevolutionGitRepo
+
         # Note: default value for allow_noninitialized=False is important
         # for invalidating an instance via self._flyweight_invalid. If this is
         # changed, we also need to override _flyweight_invalid and explicitly
@@ -791,14 +794,15 @@ class AnnexRepo(GitRepo, RepoInterface):
                     lgr.debug("Invalid .git file: %s", _git)
                     return False
 
-        initialized_annex = GitRepo.is_valid_repo(path) and \
+        initialized_annex = RevolutionGitRepo.is_valid_repo(path) and \
             (exists(opj(path, '.git', 'annex')) or
              git_file_has_annex(path))
 
         if allow_noninitialized:
             try:
                 return initialized_annex \
-                    or GitRepo(path, create=False, init=False).is_with_annex()
+                    or RevolutionGitRepo(
+                        path, create=False, init=False).is_with_annex()
             except (NoSuchPathError, InvalidGitRepositoryError):
                 return False
         else:

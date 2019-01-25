@@ -17,7 +17,7 @@ from ...version import __version__
 from ..external_versions import ExternalVersions, LooseVersion
 from ..exceptions import CommandError
 from ..exceptions import OutdatedExternalDependency, MissingExternalDependency
-from ...support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ...tests.utils import (
     with_tempfile,
     create_tree,

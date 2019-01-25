@@ -20,8 +20,8 @@ from ..helpers import strip_arg_from_argv
 
 from ...tests.utils import ok_, eq_, assert_cwd_unchanged, ok_clean_git, \
     with_tempfile, SkipTest, with_testrepos
-from ...support.annexrepo import AnnexRepo
-from ...support.gitrepo import GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from ...utils import chpwd, getpwd
 
 

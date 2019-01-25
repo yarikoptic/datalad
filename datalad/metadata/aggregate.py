@@ -72,8 +72,8 @@ from datalad.support.constraints import (
     EnsureBool,
 )
 from datalad.support.constraints import EnsureChoice
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support import json_py
 from datalad.support.path import split_ext
 from datalad.utils import (

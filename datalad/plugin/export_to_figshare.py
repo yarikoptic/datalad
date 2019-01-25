@@ -216,7 +216,7 @@ class ExportToFigshare(Interface):
         from datalad.api import add_archive_content
         from datalad.api import export_archive
         from datalad.distribution.dataset import require_dataset
-        from datalad.support.annexrepo import AnnexRepo
+        from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
         dataset = require_dataset(dataset, check_installed=True,
                                   purpose='export to figshare')

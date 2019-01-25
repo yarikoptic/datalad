@@ -23,8 +23,8 @@ from os.path import join as opj, exists, isabs, abspath
 from datalad.distribution.dataset import Dataset
 from datalad.support.param import Parameter
 from datalad.support.constraints import EnsureStr, EnsureNone, EnsureInt
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.interface.base import Interface
 from datalad.interface.base import build_doc
 

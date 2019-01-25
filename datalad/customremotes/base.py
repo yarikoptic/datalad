@@ -215,7 +215,7 @@ class AnnexCustomRemote(object):
         """
         # TODO: probably we shouldn't have runner here but rather delegate
         # to AnnexRepo's functionality
-        from ..support.annexrepo import AnnexRepo
+        from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
         from ..cmd import GitRunner
 
         self.runner = GitRunner()

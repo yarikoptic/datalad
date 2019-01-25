@@ -28,7 +28,7 @@ from datalad.interface.common_opts import location_description
 # from datalad.interface.common_opts import annex_opts
 # from datalad.interface.common_opts import annex_init_opts
 from datalad.interface.common_opts import reckless_opt
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.gitrepo import GitCommandError
 from datalad.support.constraints import EnsureNone
 from datalad.support.constraints import EnsureStr

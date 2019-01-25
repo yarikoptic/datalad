@@ -34,7 +34,7 @@ from ..consts import ARCHIVES_SPECIAL_REMOTE
 from ..support.param import Parameter
 from ..support.constraints import EnsureStr, EnsureNone
 
-from ..support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ..support.strings import apply_replacement_rules
 from ..support.stats import ActivityStats
 from ..cmdline.helpers import get_repo_instance

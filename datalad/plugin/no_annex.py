@@ -85,7 +85,7 @@ class NoAnnex(Interface):
         from os.path import exists
         from os import makedirs as makedirsfx
         from datalad.distribution.dataset import require_dataset
-        from datalad.support.annexrepo import AnnexRepo
+        from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
         from datalad.utils import assure_list
 
         pattern = assure_list(pattern)

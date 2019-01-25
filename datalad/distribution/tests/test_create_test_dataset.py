@@ -19,7 +19,7 @@ from datalad.tests.utils import ok_clean_git
 from datalad.utils import swallow_logs
 from datalad.utils import swallow_outputs
 from datalad.utils import chpwd
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.distribution.create_test_dataset import _parse_spec
 
 from nose.tools import eq_

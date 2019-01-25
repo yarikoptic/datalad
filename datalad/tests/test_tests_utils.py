@@ -63,7 +63,7 @@ from .utils import probe_known_failure
 from .utils import patch_config
 from .utils import ignore_nose_capturing_stdout
 
-from ..support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from ..support import path as op
 #
 # Test with_tempfile, especially nested invocations

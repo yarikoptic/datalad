@@ -34,7 +34,7 @@ from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureBool
 from datalad.support.constraints import EnsureNone
 from datalad.support.param import Parameter
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.interface.common_opts import recursion_flag
 from datalad.interface.common_opts import recursion_limit
 

@@ -29,7 +29,7 @@ from ...tests.utils import slow
 from ...tests.utils import assert_re_in
 from datalad.tests.utils import assert_result_values_cond
 
-from ...support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ...support.exceptions import FileNotInRepositoryError
 from ...support.exceptions import CommandError
 from ...tests.utils import with_tree, serve_path_via_http, ok_file_under_git, swallow_outputs

@@ -21,7 +21,7 @@ from ...consts import ARCHIVES_TEMP_DIR
 from ...consts import ANNEX_TEMP_DIR
 from ...consts import SEARCH_INDEX_DOTGITDIR
 from ...distribution.dataset import Dataset
-from ...support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ...tests.utils import with_tempfile
 from ...utils import swallow_outputs
 from ...utils import chpwd

@@ -51,7 +51,7 @@ from datalad.dochelpers import exc_str
 
 from datalad.support.sshconnector import get_connection_hash
 
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.gitrepo import GitCommandError
 from datalad.support.gitrepo import NoSuchPathError
 from datalad.support.gitrepo import InvalidGitRepositoryError
@@ -901,7 +901,7 @@ def test_get_tracking_branch(o_path, c_path):
 
 @with_testrepos('submodule_annex', flavors=['clone'])
 def test_submodule_deinit(path):
-    from datalad.support.annexrepo import AnnexRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
     top_repo = AnnexRepo(path, create=False)
     eq_({'subm 1', '2'}, {s.name for s in top_repo.get_submodules()})

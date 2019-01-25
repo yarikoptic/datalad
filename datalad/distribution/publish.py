@@ -31,7 +31,7 @@ from datalad.support.param import Parameter
 from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureChoice
 from datalad.support.constraints import EnsureNone
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.sshconnector import sh_quote
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.support.network import URL, RI, SSHRI, is_ssh

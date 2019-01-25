@@ -14,7 +14,7 @@ May be later could be RFed into some helper function if comes needed again
 """
 
 from collections import defaultdict
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad import lgr
 from tqdm import tqdm
 

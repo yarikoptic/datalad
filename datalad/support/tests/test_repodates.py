@@ -9,8 +9,8 @@
 
 from mock import patch
 
-from datalad.support.annexrepo import AnnexRepo
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.repodates import check_dates
 from datalad.tests.utils import assert_equal, assert_false, \
     assert_in, assert_not_in, assert_raises, eq_, ok_, \

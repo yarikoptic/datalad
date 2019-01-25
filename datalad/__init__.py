@@ -142,7 +142,7 @@ def setup_package():
     # During tests we allow for "insecure" access to local file:// and
     # http://localhost URLs since all of them either generated as tests
     # fixtures or cloned from trusted sources
-    from datalad.support.annexrepo import AnnexRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
     AnnexRepo._ALLOW_LOCAL_URLS = True
 
     DATALAD_LOG_LEVEL = os.environ.get('DATALAD_LOG_LEVEL', None)
@@ -214,7 +214,7 @@ def teardown_package():
 
     from datalad.support.cookies import cookies_db
     cookies_db.close()
-    from datalad.support.annexrepo import AnnexRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
     AnnexRepo._ALLOW_LOCAL_URLS = False  # stay safe!
 
 

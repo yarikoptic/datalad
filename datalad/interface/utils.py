@@ -36,7 +36,7 @@ from datalad.utils import with_pathsep as _with_sep  # TODO: RF whenever merge c
 from datalad.utils import path_startswith
 from datalad.utils import path_is_subpath
 from datalad.utils import assure_unicode
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.exceptions import IncompleteResultsError
 from datalad import cfg as dlcfg
 from datalad.dochelpers import exc_str

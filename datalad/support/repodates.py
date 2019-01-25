@@ -17,7 +17,9 @@ import time
 from six import string_types
 
 from datalad.log import log_progress
-from datalad.support.gitrepo import GitRepo, GitCommandError
+from datalad.support.gitrepo import GitCommandError
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+
 
 lgr = logging.getLogger('datalad.repodates')
 

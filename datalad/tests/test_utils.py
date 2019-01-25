@@ -64,7 +64,7 @@ from ..utils import map_items
 from ..utils import unlink
 from ..utils import CMD_MAX_ARG
 from ..utils import create_tree
-from ..support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
 from nose.tools import (
     assert_equal,
@@ -580,8 +580,8 @@ def test_is_explicit_path():
 @with_tempfile
 @with_tempfile
 def test_knows_annex(here, there):
-    from datalad.support.gitrepo import GitRepo
-    from datalad.support.annexrepo import AnnexRepo
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
     GitRepo(path=here, create=True)
     assert_false(knows_annex(here))
     AnnexRepo(path=here, create=True)

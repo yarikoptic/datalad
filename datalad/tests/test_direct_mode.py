@@ -22,7 +22,7 @@ from datalad import cfg
 from nose.tools import ok_
 from mock import patch
 
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.utils import swallow_logs
 from datalad.distribution.dataset import Dataset
 

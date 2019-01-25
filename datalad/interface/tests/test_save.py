@@ -24,7 +24,7 @@ from datalad.utils import (
 
 from datalad.interface.results import is_ok_dataset
 from datalad.distribution.dataset import Dataset
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.exceptions import IncompleteResultsError
 from datalad.tests.utils import ok_
 from datalad.api import save

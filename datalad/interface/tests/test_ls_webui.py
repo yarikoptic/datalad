@@ -21,8 +21,8 @@ from os.path import join as opj
 from datalad.distribution.dataset import Dataset
 from datalad.interface.ls_webui import machinesize, ignored, fs_traverse, \
     _ls_json, UNKNOWN_SIZE
-from datalad.support.annexrepo import AnnexRepo
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.tests.utils import with_tree
 from datalad.utils import swallow_logs, swallow_outputs, _path_
 # needed below as bound dataset method

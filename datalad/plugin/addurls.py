@@ -694,7 +694,7 @@ class Addurls(Interface):
 
         from datalad.distribution.dataset import Dataset, require_dataset
         from datalad.interface.results import get_status_dict
-        from datalad.support.annexrepo import AnnexRepo
+        from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
         lgr = logging.getLogger("datalad.plugin.addurls")
 

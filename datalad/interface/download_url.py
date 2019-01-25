@@ -26,7 +26,8 @@ from ..distribution.dataset import datasetmethod
 from ..distribution.dataset import EnsureDataset
 from ..distribution.dataset import require_dataset
 from ..dochelpers import exc_str
-from ..support.annexrepo import AnnexRepo, AnnexBatchCommandError
+from ..support.annexrepo import AnnexBatchCommandError
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ..support.param import Parameter
 from ..support.constraints import EnsureStr, EnsureNone
 from ..support.exceptions import NoDatasetArgumentFound

@@ -22,7 +22,7 @@ from .utils import swallow_outputs
 
 from ..auto import AutomagicIO
 
-from ..support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from .utils import with_tempfile
 from .utils import SkipTest
 from .utils import chpwd

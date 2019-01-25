@@ -119,8 +119,9 @@ def skip_if_url_is_not_available(url, regex=None):
 import git
 import os
 from os.path import exists, join
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo, FileNotInAnnexError
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.support.annexrepo import FileNotInAnnexError
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from ..utils import chpwd, getpwd
 
 

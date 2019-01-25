@@ -204,8 +204,8 @@ def get_repo_instance(path=curdir, class_=None):
     from os.path import ismount, exists, normpath, isabs
     from git.exc import InvalidGitRepositoryError
     from ..utils import expandpath
-    from ..support.gitrepo import GitRepo
-    from ..support.annexrepo import AnnexRepo
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+    from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 
     dir_ = expandpath(path)
     abspath_ = path if isabs(path) else dir_

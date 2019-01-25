@@ -80,7 +80,7 @@ class ExportArchive(Interface):
 
         from datalad.distribution.dataset import require_dataset
         from datalad.utils import file_basename
-        from datalad.support.annexrepo import AnnexRepo
+        from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
         from datalad.dochelpers import exc_str
 
         import logging

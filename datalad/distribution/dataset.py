@@ -26,10 +26,10 @@ import wrapt
 from datalad import cfg
 from datalad.config import ConfigManager
 from datalad.dochelpers import exc_str
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.constraints import Constraint
 from datalad.support.exceptions import NoDatasetArgumentFound
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.support.gitrepo import InvalidGitRepositoryError
 from datalad.support.gitrepo import NoSuchPathError
 from datalad.support.repo import Flyweight

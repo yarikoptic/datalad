@@ -23,7 +23,7 @@ from datalad.interface.base import Interface
 from datalad.interface.utils import eval_results
 from datalad.interface.base import build_doc
 from datalad.interface.results import get_status_dict
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.constraints import EnsureStr
 from datalad.support.constraints import EnsureChoice
 from datalad.support.constraints import EnsureNone
@@ -37,7 +37,7 @@ from datalad.support.exceptions import RemoteNotAvailableError
 from datalad.support.exceptions import DownloadError
 from datalad.support.network import RI
 from datalad.support.network import URL
-from datalad.support.gitrepo import GitRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
 from datalad.interface.common_opts import recursion_flag
 from datalad.interface.common_opts import recursion_limit
 from datalad.interface.common_opts import as_common_datasrc

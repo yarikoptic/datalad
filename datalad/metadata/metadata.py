@@ -37,8 +37,8 @@ from datalad.support.constraints import (
     EnsureBool,
     EnsureStr,
 )
-from datalad.support.gitrepo import GitRepo
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.param import Parameter
 import datalad.support.ansi_colors as ac
 from datalad.support.json_py import (

@@ -13,7 +13,7 @@ import logging
 import os
 
 from datalad.api import check_dates
-from datalad.support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from datalad.support.exceptions import IncompleteResultsError
 from datalad.support.tests.test_repodates import set_date
 from datalad.tests.utils import assert_dict_equal, assert_false, assert_in, \

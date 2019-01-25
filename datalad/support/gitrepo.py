@@ -2280,6 +2280,8 @@ class GitRepo(RepoInterface):
           must exist in the remote repository, and will be checked out locally
           as a tracking branch. If `None`, remote HEAD will be checked out.
         """
+        # TODO(revolution): Remove once RevolutionGitRepo is absorbed.
+        from datalad.revolution.gitrepo import RevolutionGitRepo
         if name is None:
             name = path
         # XXX the following should do it, but GitPython will refuse to add a submodule
@@ -2295,7 +2297,8 @@ class GitRepo(RepoInterface):
             cmd += ['-b', branch]
         if url is None:
             # repo must already exist locally
-            subm = GitRepo(op.join(self.path, path), create=False, init=False)
+            subm = RevolutionGitRepo(op.join(self.path, path),
+                                     create=False, init=False)
             # check that it has a commit, and refuse
             # to operate on it otherwise, or we would get a bastard
             # submodule that cripples git operations
@@ -2659,6 +2662,9 @@ def _fixup_submodule_dotgit_setup(ds, relativepath):
     Each subdataset/module has its own .git directory where a standalone
     repository would have it. No gitdir files, no symlinks.
     """
+    # TODO(revolution): Remove once RevolutionGitRepo is absorbed.
+    from datalad.revolution.gitrepo import RevolutionGitRepo as GitRepo
+
     # move .git to superrepo's .git/modules, remove .git, create
     # .git-file
     path = opj(ds.path, relativepath)

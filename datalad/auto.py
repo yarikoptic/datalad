@@ -28,7 +28,7 @@ from git.exc import InvalidGitRepositoryError
 
 from .utils import getpwd
 from .dochelpers import exc_str
-from .support.annexrepo import AnnexRepo
+from datalad.revolution.annexrepo import RevolutionAnnexRepo as AnnexRepo
 from .cmdline.helpers import get_repo_instance
 from .consts import HANDLE_META_DIR
 
