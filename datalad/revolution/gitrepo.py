@@ -29,7 +29,6 @@ from datalad.support.gitrepo import (
     to_options,
 )
 from datalad.support.exceptions import CommandError
-from datalad.interface.results import get_status_dict
 
 lgr = logging.getLogger('datalad.revolution.gitrepo')
 
@@ -600,6 +599,8 @@ class RevolutionGitRepo(GitRepo):
 
     def save_(self, message=None, paths=None, _status=None, **kwargs):
         """Like `save()` but working as a generator."""
+        from datalad.interface.results import get_status_dict
+
         status = self._save_pre(paths, _status, **kwargs)
         if not status:
             # all clean, nothing todo
