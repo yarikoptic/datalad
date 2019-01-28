@@ -40,6 +40,7 @@ class RevolutionGitRepo(GitRepo):
     # End Flyweight:
 
     def __init__(self, *args, **kwargs):
+        self._allow_initiation = True
         super(RevolutionGitRepo, self).__init__(*args, **kwargs)
         # the sole purpose of this init is to add a pathlib
         # native path object to the instance

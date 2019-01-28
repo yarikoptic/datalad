@@ -547,6 +547,10 @@ class GitRepo(RepoInterface):
     # should do it once
     _config_checked = False
 
+    # TODO(revolution): Remove _allow_initiation once
+    # Revolution.{Git,Annex}Repo are absorbed.
+    _allow_initiation = False
+
     # Begin Flyweight:
 
     _unique_instances = WeakValueDictionary()
@@ -714,6 +718,9 @@ class GitRepo(RepoInterface):
             self.configure_fake_dates()
         # Set by fake_dates_enabled to cache config value across this instance.
         self._fake_dates_enabled = None
+
+        if not self._allow_initiation:
+            raise RuntimeError("Only Revolution repo classes should be used")
 
     def _create_empty_repo(self, path, **kwargs):
         try:
