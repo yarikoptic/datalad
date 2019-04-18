@@ -2243,6 +2243,12 @@ def collect_call_sigs_stats(f,
 
     CALL_SIGS_STATS = {}
 
+    # record default kwarg values
+    import inspect
+    f_args, varargs, varkw, defaults = inspect.getargspec(f)
+    f_defaults = dict(zip(f_args[-len(defaults):], defaults))
+    assert len(f_defaults) == len(defaults)
+
     def display_call_sigs_stats():
         print("===== Call signature statistics for %s" % name)
         # sort by count
@@ -2278,7 +2284,14 @@ def collect_call_sigs_stats(f,
         sig_args = tuple(sig_args)
 
         sig_kwargs = {}
-        for kwarg, value in kwargs.items():
+        # report in order they are in the signature
+        #for kwarg, value in kwargs.items():
+        for kwarg in f_args[-len(f_defaults):]:
+            if kwarg not in kwargs:
+                continue
+            value = kwargs[kwarg]
+            if f_defaults[kwarg] == value:
+                continue  # skip explicitly specified defaults
             if kwarg in adapters:
                 value = adapters[kwarg](value)
             sig_kwargs[kwarg] = value
