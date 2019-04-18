@@ -397,12 +397,13 @@ class Runner(object):
         return x # dunno any better
 
     @collect_call_sigs_stats(
-        ignore_args=[0, 1],
-        kwargs_handlers={
+        ignore_args=[0],  # no self
+        adapters={
             'env': present,  # do not care about values, just either it was specified
             'cwd': present,
             'log_stdout': log_stdvalue,
             'log_stderr': log_stdvalue,
+            1: lambda v: "cmd=<%s>" % type(v).__name__,  # type of cmd - list or str?
         }
     ) # i.e. ignore self, cmd
     def run(self, cmd, log_stdout=True, log_stderr=True, log_online=False,
