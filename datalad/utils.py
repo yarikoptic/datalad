@@ -2252,7 +2252,7 @@ def collect_call_sigs_stats(f,
     def display_call_sigs_stats():
         print("===== Call signature statistics for %s" % name)
         # sort by count
-        items = sorted(CALL_SIGS_STATS.items(), key=lambda x: x[1], reverse=True)
+        items = sorted(CALL_SIGS_STATS.items(), key=lambda x: x[1][1], reverse=True)
         for (args, kwargs), (count, total_times) in items:
             kwargs = tuple("%s=%r" % x for x in kwargs)
             print(

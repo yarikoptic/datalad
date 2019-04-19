@@ -418,6 +418,8 @@ class Runner(object):
                 #     cmd_op += ' ' + cmd[idx]
                 #     idx += 1
                 cmd_ = "%s %s" % (cmd_, cmd_op)
+            if cmd_ == 'git config ...':
+                cmd_ = ' '.join(cmd)  # entirety
             return "cmd=%s" % cmd_
         return "cmd=<%s>" % type(cmd).__name__
 
