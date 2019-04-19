@@ -396,6 +396,32 @@ class Runner(object):
             return x.__class__.__name__
         return x # dunno any better
 
+    def cmd_maybe_git_command(cmd):
+        if isinstance(cmd, list):
+            cmd_ = op.basename(cmd[0])
+            if cmd_ in ['git']:
+                # consume all -c's
+                idx = 1
+                #import pdb; pdb.set_trace()
+                while idx < len(cmd) and cmd[idx] == '-c':
+                    idx += 2
+                cmd_op = cmd[idx]
+                if cmd_op == 'annex':
+                    # get one next whatever
+                    idx += 1
+                    cmd_op += " " + cmd[idx]
+                if idx < len(cmd):
+                    cmd_op += " ..."
+                # get all until '--' which we add for files
+                # idx += 1
+                # while idx < len(cmd) and cmd[idx] != '--':
+                #     cmd_op += ' ' + cmd[idx]
+                #     idx += 1
+                cmd_ = "%s %s" % (cmd_, cmd_op)
+            return "cmd=%s" % cmd_
+        return "cmd=<%s>" % type(cmd).__name__
+
+
     @collect_call_sigs_stats(
         ignore_args=[0],  # no self
         adapters={
@@ -403,7 +429,8 @@ class Runner(object):
             'cwd': present,
             'log_stdout': log_stdvalue,
             'log_stderr': log_stdvalue,
-            1: lambda v: "cmd=<%s>" % type(v).__name__,  # type of cmd - list or str?
+            1: cmd_maybe_git_command,  # type of cmd - list or str?
+            # 1: lambda cmd: "cmd=<%s>" % type(cmd).__name__
         }
     ) # i.e. ignore self, cmd
     def run(self, cmd, log_stdout=True, log_stderr=True, log_online=False,
