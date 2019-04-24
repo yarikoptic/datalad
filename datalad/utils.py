@@ -2250,15 +2250,43 @@ def collect_call_sigs_stats(f,
     assert len(f_defaults) == len(defaults)
 
     def display_call_sigs_stats():
+        import time
+        import datalad
+        wall = time.time() - datalad._time0
+
         print("===== Call signature statistics for %s" % name)
+
         # sort by count
+        fmt = "%-5d (%5.2f%% %2.2f wall, %2.2f user, %2.2f sys) %s"
+
+        def print_(count, total_times, suf):
+            print(
+                fmt %
+                tuple([count, 100.*total_times[0]/wall] + total_times + [suf])
+            )
+
         items = sorted(CALL_SIGS_STATS.items(), key=lambda x: x[1][1], reverse=True)
+        total_times_sum, total_count = None, 0
         for (args, kwargs), (count, total_times) in items:
             kwargs = tuple("%s=%r" % x for x in kwargs)
-            print(
-                "%-5d (%2.2f wall, %2.2f user, %2.2f sys) of %s"
-                % tuple([count] + total_times + [', '.join(map(str, tuple(args) + kwargs))])
+            if total_times_sum is None:
+                total_times_sum = total_times[:]
+            else:
+                total_times_sum = [
+                    o + n
+                    for o, n in zip(total_times_sum, total_times)
+                ]
+            total_count += count
+            print_(
+                count, total_times, "of " + ', '.join(map(str, tuple(args) + kwargs))
             )
+        print("-----")
+        print_(
+            total_count,
+            total_times_sum,
+            "with process wall %2.2f" % wall
+        )
+
 
     import atexit, resource
     atexit.register(display_call_sigs_stats)

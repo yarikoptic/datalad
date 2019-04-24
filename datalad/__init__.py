@@ -14,6 +14,9 @@ the command line, run 'datalad --help' for a summary of the available commands.
 From an interactive Python session, import `datalad.api` and inspect its
 documentation with `help`.
 """
+# For timing
+import time as _time
+_time0 = _time.time()
 
 # For reproducible demos/tests
 import os
