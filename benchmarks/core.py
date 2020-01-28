@@ -125,23 +125,33 @@ class runner(SuprocBenchmarks):
 
     unit = "% overhead"
 
-    def _get_overhead(self, cmd, nrepeats=3, **run_kwargs):
+    def _get_overhead(self, cmd, nrepeats=10, **run_kwargs):
         """Estimate overhead over running command via the simplest os.system
-        and to not care about any output
+        and to not care about any output.
+
+        Returns % of overhead. So 0 - is no change. 100 -- twice slower.
+        Cannot be below -100.
         """
         # asv does not repeat tracking ones I think, so nrepeats
         overheads = []
+        # And average across multiple runs
+        t1s = [time()]
         for _ in range(nrepeats):
-            t0 = time()
             os.system(cmd + " >/dev/null 2>&1")
-            t1 = time()
+            t1s.append(time())
+        t2s = []
+        for _ in range(nrepeats):
             self.runner.run(cmd, **run_kwargs)
-            t2 = time()
-            overhead = 100 * ((t2 - t1) / (t1 - t0) - 1.0)
-            # print("O :", t1 - t0, t2 - t0, overhead)
-            overheads.append(overhead)
-        overhead = round(sum(overheads) / len(overheads), 2)
-        #overhead = round(min(overheads), 2)
+            t2s.append(time())
+        get_dts = lambda x: [a - b for a, b in zip (x[1:], x[:-1])]
+        dt1s = (get_dts(t1s))
+        dt2s = (get_dts(t2s))
+        dt1 = min(dt1s)
+        dt2 = sum(dt2s) / nrepeats
+        overhead = (round(100 * (dt2 / dt1 - 1.0), 2))
+        # print(dt1, dt2, overhead)
+        #print(dt1s, dt1)
+        #print(dt2s, dt2, overhead)
         return overhead
 
     def track_overhead_echo(self):
