@@ -18,11 +18,38 @@ from time import time
 from subprocess import call
 
 try:
-    from datalad.cmd import WitlessRunner
+    from datalad.cmd import (
+        WitlessRunner,
+        kill_output,
+        capture_output, lgr, linesep_bytes,
+    )
     class Runner(WitlessRunner):
         def run(self, cmd, *args, **kwargs):
+            # shimming "renamed" kwargs
+            # https://github.com/datalad/datalad/pull/4080/files#r371882230
+            for out in 'stdout', 'stderr':
+                proc_ = 'proc_' + out
+                log_ = 'log_' + out
+                if log_ in kwargs:
+                    v = kwargs.pop(log_, False)
+                    if not v:
+                        pass
+                    elif v in ('offline', 'online', True):
+                        # TODO: actually log
+                        kwargs[proc_] = kill_output
+                    elif isinstance(v, (str, bytes)):
+                        raise ValueError(v)
+                    else:
+                        # callable -- we just pass all into it, and assume that
+                        # nothing is left behind
+                        # TODO: split on linesep_bytes and feed one line at a time?
+
+                        # Trying to figure out why it fails with "string is not callable"
+                        print(v, type(v), v("123"))
+                        kwargs[proc_] = lambda x: (v(x), 0)
+            kwargs.pop('log_online', None)  # it is implied (???)
             cmd_list = ["/bin/sh", "-c", cmd]
-            return super(WitlessRunner, self).run(cmd_list, *args, **kwargs)
+            return super(Runner, self).run(cmd_list, *args, **kwargs)
 
 except ImportError:
     from datalad.cmd import Runner
