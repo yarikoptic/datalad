@@ -17,7 +17,15 @@ import timeit
 from time import time
 from subprocess import call
 
-from datalad.cmd import Runner
+try:
+    from datalad.cmd import WitlessRunner
+    class Runner(WitlessRunner):
+        def run(self, cmd, *args, **kwargs):
+            cmd_list = ["/bin/sh", "-c", cmd]
+            return super(WitlessRunner, self).run(cmd_list, *args, **kwargs)
+
+except ImportError:
+    from datalad.cmd import Runner
 
 from datalad.api import add
 from datalad.api import create
