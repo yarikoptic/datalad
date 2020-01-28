@@ -23,6 +23,11 @@ try:
         kill_output,
         capture_output, lgr, linesep_bytes,
     )
+
+    def witless_call(f):
+        def func(*args):
+            return f(*args).encode(), 0
+        return func
     class Runner(WitlessRunner):
         def run(self, cmd, *args, **kwargs):
             # shimming "renamed" kwargs
@@ -43,10 +48,7 @@ try:
                         # callable -- we just pass all into it, and assume that
                         # nothing is left behind
                         # TODO: split on linesep_bytes and feed one line at a time?
-
-                        # Trying to figure out why it fails with "string is not callable"
-                        print(v, type(v), v("123"))
-                        kwargs[proc_] = lambda x: (v(x), 0)
+                        kwargs[proc_] = witless_call(v)  # lambda x: (v(x), 0)
             kwargs.pop('log_online', None)  # it is implied (???)
             cmd_list = ["/bin/sh", "-c", cmd]
             return super(Runner, self).run(cmd_list, *args, **kwargs)
