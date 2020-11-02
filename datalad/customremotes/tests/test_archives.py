@@ -168,14 +168,16 @@ def test_annex_get_from_subdir(topdir):
     annex = AnnexRepo(topdir, init=True)
     annex.add('a.tar.gz')
     annex.commit()
-    print("HERE")
     add_archive_content('a.tar.gz', annex=annex, delete=True)
-    print("HERE DONE")
+    from datalad.tests.utils import assert_no_open_files
+    assert_no_open_files(annex.path)
     fpath = op.join(topdir, 'a', 'd', fn_in_archive_obscure)
 
     with chpwd(op.join(topdir, 'a', 'd')):
         runner = Runner()
-        runner(['git', 'annex', 'drop', '--', fn_in_archive_obscure])  # run git annex drop
+        sys.stderr.write("Running %s\n" % repr(['git', 'annex', 'drop', '--debug', '--', fn_in_archive_obscure]))  # run git annex drop
+        import pdb; pdb.set_trace()
+        runner(['git', 'annex', 'drop', '--debug', '--', fn_in_archive_obscure])  # run git annex drop
         assert_false(annex.file_has_content(fpath))             # and verify if file deleted from directory
         runner(['git', 'annex', 'get', '--', fn_in_archive_obscure])   # run git annex get
         assert_true(annex.file_has_content(fpath))              # and verify if file got into directory

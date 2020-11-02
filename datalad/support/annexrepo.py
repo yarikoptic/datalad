@@ -1973,7 +1973,9 @@ class AnnexRepo(GitRepo, RepoInterface):
             raise InsufficientArgumentsError("drop() requires at least to "
                                              "specify 'files' or 'options'")
 
-        options = ensure_list(options)
+        import sys
+        sys.stderr.write("STDERR: About to drop")
+        options = ensure_list(options) + ['--debug']
 
         if key:
             # we can't drop multiple in 1 line, and there is no --batch yet, so
