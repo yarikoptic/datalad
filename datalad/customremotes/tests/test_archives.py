@@ -168,7 +168,9 @@ def test_annex_get_from_subdir(topdir):
     annex = AnnexRepo(topdir, init=True)
     annex.add('a.tar.gz')
     annex.commit()
+    print("HERE")
     add_archive_content('a.tar.gz', annex=annex, delete=True)
+    print("HERE DONE")
     fpath = op.join(topdir, 'a', 'd', fn_in_archive_obscure)
 
     with chpwd(op.join(topdir, 'a', 'd')):

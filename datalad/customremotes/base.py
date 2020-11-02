@@ -27,6 +27,7 @@ import logging
 lgr = logging.getLogger('datalad.customremotes')
 lgr.log(5, "Importing datalad.customremotes.main")
 
+from time import sleep
 from ..ui import ui
 from ..support.protocol import ProtocolInterface
 from ..support.cache import DictCache
@@ -107,7 +108,7 @@ send () {
         self.realrepopath = Path(repopath).resolve()
         self.custom_remote_name = custom_remote_name
         self._file = None
-        self._initiated = False
+        self._finitiated = False
 
     def initiate(self):
         if self._initiated:
@@ -266,6 +267,15 @@ class AnnexCustomRemote(object):
         # of arbitrary hardcoded order
         self._scheme_hits = Counter({s: 0 for s in self.SUPPORTED_SCHEMES})
 
+        # import signal
+        # self.debug("Installing signal handlers")
+        # def signal_handler(sig, frame):
+        #     self.debug('Received a signal %s within %s!' % (sig, frame))
+        #     sys.exit(0)
+        # signal.signal(signal.SIGINT, signal_handler)
+        # signal.signal(signal.SIGTERM, signal_handler)
+        self._sleep = 0
+
     @classmethod
     def _introspect_req_signatures(cls):
         """
@@ -302,7 +312,7 @@ class AnnexCustomRemote(object):
         of the result (we are asking the location for the same archive key often)
         """
         if key not in self._contentlocations:
-            fpath = self.repo.get_contentlocation(key, batch=True)
+            fpath = self.repo.get_contentlocation(key) # , batch=True)
             if fpath:  # shouldn't store empty ones
                 self._contentlocations[key] = fpath
         else:
@@ -370,9 +380,18 @@ class AnnexCustomRemote(object):
         # TODO: should we strip or should we not? verify how annex would deal
         # with filenames starting/ending with spaces - encoded?
         # Split right away
+        if self._sleep:
+            self.debug("Sleeping for %r" % self._sleep)
+            sleep(self._sleep)
+        self.debug("Waiting for the line from %s which is %s" % (self.fin, self.fin.closed))
         l = self.fin.readline().rstrip(os.linesep)
+        with open("/tmp/protocol.log", "a") as f:
+            f.write("Read: %r\n" % l)
+        self.debug("Read: %r" % l)
         if self._protocol is not None:
             self._protocol += "recv %s" % l
+        if l == 'EXITNOW':
+            self.stop(l)
         msg = l.split(None, n)
         if req and ((not msg) or (req != msg[0])):
             # verify correct response was given
@@ -390,8 +409,9 @@ class AnnexCustomRemote(object):
 
     # Since protocol allows for some messaging back, let's duplicate to lgr
     def debug(self, msg):
-        lgr.debug(msg)
-        self.send("DEBUG", msg)
+        sys.stderr.write("STDERR: %s\n" % msg)
+        #lgr.debug(msg)
+        #self.send("DEBUG", msg)
 
     def error(self, msg, annex_err="ERROR"):
         lgr.error(msg)
@@ -413,6 +433,7 @@ class AnnexCustomRemote(object):
             self._in_the_loop = True
             self._loop()
         except AnnexRemoteQuit:
+            self.debug("AnnexRemoteQuit")
             pass  # no harm
         except KeyboardInterrupt:
             self.stop("Interrupted by user")
@@ -422,8 +443,10 @@ class AnnexCustomRemote(object):
             self._in_the_loop = False
 
     def stop(self, msg=None):
-        lgr.debug("Stopping communications of %s%s" %
+        self.debug("Stopping communications of %s%s" %
                  (self, ": %s" % msg if msg else ""))
+        lgr.debug("Stopping communications of %s%s",
+                 self, ": %s" % msg if msg else "")
         raise AnnexRemoteQuit(msg)
 
     def _loop(self):
@@ -435,9 +458,9 @@ class AnnexCustomRemote(object):
         while True:
             l = self.read(n=1)
 
-            if l is not None and not l:
-                # empty line: exit
-                self.stop()
+            if l is not None and (not l or l == 'EXITNOW'):
+                # empty line or explicit EXITNOW (TEMP measure): exit
+                self.stop(l)
                 return
 
             req, req_load = l[0], l[1:]

@@ -1802,7 +1802,7 @@ class AnnexRepo(GitRepo, RepoInterface):
           In batch mode only ATM returns dict representation of json output returned
           by annex
         """
-
+        batch = False
         if git_options:
             lgr.warning("add_url_to_file: git_options not yet implemented. Ignored.")
 
@@ -1812,6 +1812,7 @@ class AnnexRepo(GitRepo, RepoInterface):
         options = options[:] if options else []
         git_options = []
         kwargs = dict(backend=backend)
+        options += ['--force', '--debug']  # to avoid checkignore
         if lexists(opj(self.path, file_)) and \
                 unlink_existing and \
                 not self.is_under_annex(file_):
@@ -3645,14 +3646,13 @@ class BatchedAnnex(BatchedCommand):
         if not isinstance(annex_cmd, list):
             annex_cmd = [annex_cmd]
         cmd = \
-            ['git'] + \
+            ['git-annex'] + \
             (git_options if git_options else []) + \
-            ['annex'] + \
             annex_cmd + \
             (annex_options if annex_options else []) + \
             (['--json', '--json-error-messages'] if json else []) + \
             ['--batch'] + \
-            (['--debug'] if lgr.getEffectiveLevel() <= 8 else [])
+            (['--debug'] if lgr.getEffectiveLevel() <= 8 else []) + ['--debug']
         output_proc = \
             output_proc if output_proc else readline_json if json else None
         super(BatchedAnnex, self).__init__(

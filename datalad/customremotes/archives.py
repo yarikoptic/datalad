@@ -368,13 +368,15 @@ class ArchiveAnnexCustomRemote(AnnexCustomRemote):
                 continue
             akeys_tried.append(akey)
             try:
-                with lock_if_check_fails(
-                    check=(self.get_contentlocation, (akey,)),
-                    lock_path=(lambda k: opj(self.repo.path, '.git', 'datalad-archives-%s' % k), (akey,)),
-                    operation="annex-get"
-                ) as (akey_fpath, lock):
-                    if lock:
-                        assert not akey_fpath
+                # with lock_if_check_fails(
+                #     check=(self.get_contentlocation, (akey,)),
+                #     lock_path=(lambda k: opj(self.repo.path, '.git', 'datalad-archives-%s' % k), (akey,)),
+                #     operation="annex-get"
+                # ) as (akey_fpath, lock):
+                #     if lock:
+                #         assert not akey_fpath
+                akey_fpath = self.get_contentlocation(akey)
+                if not akey_fpath:
                         self._annex_get_archive_by_key(akey)
                         akey_fpath = self.get_contentlocation(akey)
 
@@ -397,6 +399,7 @@ class ArchiveAnnexCustomRemote(AnnexCustomRemote):
                 apath = self.cache[akey_path].get_extracted_file(afile)
                 link_file_load(apath, path)
                 self.send('TRANSFER-SUCCESS', cmd, key)
+                self._sleep = 0
                 return
             except Exception as exc:
                 # from celery.contrib import rdb

@@ -40,6 +40,7 @@ from .support.protocol import (
     ExecutionTimeExternalsProtocol,
 )
 from .utils import (
+    assert_no_open_files,
     auto_repr,
     ensure_bytes,
     ensure_unicode,
@@ -97,14 +98,16 @@ def _get_output_stream(log_std, false_value):
 
 
 def _cleanup_output(stream, std):
+    sys.stderr.write("Cleaning up %s\n" % stream)
     if isinstance(stream, file_class) and \
         _MAGICAL_OUTPUT_MARKER in getattr(stream, 'name', ''):
         if not stream.closed:
             stream.close()
         if op.exists(stream.name):
             unlink(stream.name)
-    elif stream == subprocess.PIPE:
+    elif stream == subprocess.PIPE and hasattr(std, 'close'):
         std.close()
+    sys.stderr.write("Done cleaning up %s\n" % stream)
 
 
 def run_gitcommand_on_file_list_chunks(func, cmd, files, *args, **kwargs):
@@ -916,7 +919,7 @@ class Runner(object):
             try:
                 proc = subprocess.Popen(cmd,
                                         stdout=outputstream,
-                                        stderr=errstream,
+                                        stderr=None, # errstream,
                                         shell=shell,
                                         cwd=popen_cwd,
                                         env=popen_env,
@@ -1226,7 +1229,7 @@ class BatchedCommand(SafeDelCloseMixin):
             self.cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=self._stderr_out,
+            # stderr=self._stderr_out,
             env=GitRunnerBase.get_git_environ_adjusted(),
             cwd=self.path,
             bufsize=1,
@@ -1327,15 +1330,16 @@ class BatchedCommand(SafeDelCloseMixin):
         """
         ret = None
         process = self._process
-        if self._stderr_out:
-            # close possibly still open fd
-            lgr.debug(
-                "Closing stderr of %s", process)
-            os.fdopen(self._stderr_out).close()
-            self._stderr_out = None
+        if process is None:
+            lgr.debug("close was called on a None process. Nothing we can do here")
+            return
         if process:
+            #import pdb; pdb.set_trace()
+            sys.stderr.write("STDERR: Closing stdin/stdout of batched process %d for %s\n"
+                             % (process.pid, self.cmd))
             lgr.debug(
-                "Closing stdin of %s and waiting process to finish", process)
+                "Closing stdin %s and stdout %s of %s and waiting process to finish",
+                process.stdin, process.stdout, process.pid)
             process.stdin.close()
             process.stdout.close()
             from . import cfg
@@ -1367,6 +1371,14 @@ class BatchedCommand(SafeDelCloseMixin):
             self._process = None
             lgr.debug("Process %s has finished", process)
 
+        if self._stderr_out:
+            # close possibly still open fd
+            lgr.debug(
+                "Closing stderr of %s", process.pid)
+            os.fdopen(self._stderr_out).close()
+            assert_no_open_files(self._stderr_out_fname)
+            self._stderr_out = None
+
         # It is hard to debug when something is going wrong. Hopefully logging stderr
         # if generally asked might be of help
         if lgr.isEnabledFor(5):
@@ -1384,7 +1396,9 @@ class BatchedCommand(SafeDelCloseMixin):
             if log_stderr:
                 stderr = ensure_unicode(stderr)
                 stderr = stderr.splitlines()
-                lgr.log(5, "stderr of %s had %d lines:", process.pid, len(stderr))
+                lgr.log(5, "stderr of %s had %d lines:",
+                        process.pid if process else "already gone",
+                        len(stderr))
                 for l in stderr:
                     lgr.log(5, "| " + l)
 
