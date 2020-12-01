@@ -314,7 +314,11 @@ def test_AnnexRepo_file_has_content(batch, src, annex_path):
     assert_false(ar.file_has_content("bogus.txt", batch=batch))
     ok_(ar.file_has_content("test-annex.dat", batch=batch))
 
+    from datalad import lgr
+    lgr.setLevel(10)
     ar.unlock(["test-annex.dat"])
+    for r in range(10):
+        print(r, ar.file_has_content(["test-annex.dat"], batch=batch))
     eq_(ar.file_has_content(["test-annex.dat"], batch=batch),
         [ar.supports_unlocked_pointers])
     with open(opj(annex_path, "test-annex.dat"), "a") as ofh:
