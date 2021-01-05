@@ -817,6 +817,11 @@ class GitRepo(RepoInterface, metaclass=PathBasedFlyweight):
         #            "".format(cls, args, kwargs, cls._unique_instances[id_])
         pass
 
+    def _flyweight_reuse(self):
+        # we need to reload config.  It helps to mitigate spurious failures
+        # to read up-to-date config values, see e.g. https://github.com/datalad/datalad/issues/4644
+        self._cfg.reload()
+
     # End Flyweight
 
     def __hash__(self):

@@ -140,6 +140,11 @@ class Flyweight(type):
         """
         return None
 
+    def _flyweight_reuse(cls, instance):
+        """overload to perform additional actions when an instance is reused
+        """
+        pass
+
     def __call__(cls, *args, **kwargs):
 
         id_, new_args, new_kwargs = cls._flyweight_id_from_args(*args, **kwargs)
@@ -165,6 +170,7 @@ class Flyweight(type):
             msg = cls._flyweight_reject(id_, *new_args, **new_kwargs)
             if msg is not None:
                 raise InvalidInstanceRequestError(id_, msg)
+            cls._flyweight_reuse(instance)
 
         return instance
 
