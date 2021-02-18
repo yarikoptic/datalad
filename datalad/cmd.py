@@ -82,7 +82,8 @@ async def run_async_cmd(loop, cmd, protocol, stdin, protocol_kwargs=None,
       protocol class.
     """
     lgr.debug('Async run %s', cmd)
-
+    if stdin:
+        import pdb; pdb.set_trace()
     if protocol_kwargs is None:
         protocol_kwargs = {}
     cmd_done = asyncio.Future(loop=loop)
@@ -181,17 +182,47 @@ class WitlessProtocol(asyncio.SubprocessProtocol):
             # fd_name prefix
             lgr.log(5, "%s| %s " % (fd_name, log_data))
 
+    # XXXasync
+    # (Pdb) p transport
+    # <_UnixSubprocessTransport pid=4134550 running stdout=<_UnixReadPipeTransport fd=6 polling>
+    # stderr=<_UnixReadPipeTransport fd=8 polling>>
+    #   /usr/lib/python3.9/asyncio/base_events.py(629)run_until_complete()
+    # -> self.run_forever()
+    #   /usr/lib/python3.9/asyncio/base_events.py(596)run_forever()
+    # -> self._run_once()
+    #   /usr/lib/python3.9/asyncio/base_events.py(1890)_run_once()
+    # -> handle._run()
+    #   /usr/lib/python3.9/asyncio/events.py(80)_run()
+    # -> self._context.run(self._callback, *self._args)
+    # > /home/yoh/proj/datalad/datalad-master/datalad/cmd.py(186)connection_made()
+    # -> self.transport = transport
     def connection_made(self, transport):
         self.transport = transport
         self.pid = transport.get_pid()
         lgr.debug('Process %i started', self.pid)
 
+    # XXXasync
+    #   /home/yoh/proj/datalad/datalad-master/datalad/cmd.py(395)run()
+    # -> results = event_loop.run_until_complete(
+    #   /usr/lib/python3.9/asyncio/base_events.py(629)run_until_complete()
+    # -> self.run_forever()
+    #   /usr/lib/python3.9/asyncio/base_events.py(596)run_forever()
+    # -> self._run_once()
+    #   /usr/lib/python3.9/asyncio/base_events.py(1890)_run_once()
+    # -> handle._run()
+    #   /usr/lib/python3.9/asyncio/events.py(80)_run()
+    # -> self._context.run(self._callback, *self._args)
+    # > /home/yoh/proj/datalad/datalad-master/datalad/cmd.py(205)pipe_data_received()
+    # -> self._log(fd, data)
+    # (Pdb) p fd
+    # 1
     def pipe_data_received(self, fd, data):
         self._log(fd, data)
         # store received output if stream was to be captured
         if self.buffer[fd - 1] is not None:
             self.buffer[fd - 1].extend(data)
 
+    # called in run_async_cmd and AnnexJsonProtocol._prepare_result
     def _prepare_result(self):
         """Prepares the final result to be returned to the runner
 
@@ -202,6 +233,7 @@ class WitlessProtocol(asyncio.SubprocessProtocol):
         this exception class as kwargs on error. The Runner will overwrite
         'cmd' and 'cwd' on error, if they are present in the result.
         """
+        # XXXasync - transport
         return_code = self.transport.get_returncode()
         lgr.debug(
             'Process %i exited with return code %i',
@@ -361,6 +393,7 @@ class WitlessRunner(object):
             cwd=cwd,
         )
 
+        # XXXasync
         # rescue any event-loop to be able to reassign after we are done
         # with our own event loop management
         # this is how ipython does it
@@ -377,6 +410,7 @@ class WitlessRunner(object):
             new_loop = True
         try:
             # include the subprocess manager in the asyncio event loop
+            # XXXasync  results is future's result
             results = event_loop.run_until_complete(
                 run_async_cmd(
                     event_loop,
@@ -395,6 +429,9 @@ class WitlessRunner(object):
                 # terminate the event loop, cannot be undone, hence we start a fresh
                 # one each time (see BlockingIOError notes above)
                 event_loop.close()
+
+        # no XXXasync (assuming that result record is generic as it is produced by _prepare_result)
+        # and has some dependency on "transport"
 
         # log before any exception is raised
         lgr.log(8, "Finished running %r with status %s", cmd, results['code'])
@@ -681,7 +718,8 @@ class SafeDelCloseMixin(object):
     """
     def __del__(self):
         try:
-            self.close()
+            # self.close()
+            pass
         except TypeError:
             if os.fdopen is None or lgr.debug is None:
                 # if we are late in the game and things already gc'ed in py3,
@@ -715,7 +753,7 @@ class BatchedCommand(SafeDelCloseMixin):
         self._stderr_out, self._stderr_out_fname = tempfile.mkstemp()
         self._process = subprocess.Popen(
             self.cmd,
-            stdin=subprocess.PIPE,
+            stdin=None, # subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=self._stderr_out,
             env=GitRunnerBase.get_git_environ_adjusted(),
@@ -758,12 +796,15 @@ class BatchedCommand(SafeDelCloseMixin):
         str or list
           Output received from process.  list in case if cmds was a list
         """
-        input_multiple = isinstance(cmds, list)
-        if not input_multiple:
-            cmds = [cmds]
+        if cmds:
+            input_multiple = isinstance(cmds, list)
+            if not input_multiple:
+                cmds = [cmds]
 
-        output = [o for o in self.yield_(cmds)]
-        return output if input_multiple else output[0]
+            output = [o for o in self.yield_(cmds)]
+            return output if input_multiple else output[0]
+        else:
+            return
 
     def yield_(self, cmds):
         """Same as __call__, but requires `cmds` to be an iterable
