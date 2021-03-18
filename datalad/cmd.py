@@ -88,26 +88,39 @@ async def run_async_cmd(loop, cmd, protocol, stdin, protocol_kwargs=None,
         protocol_kwargs = {}
     cmd_done = asyncio.Future(loop=loop)
     factory = functools.partial(protocol, cmd_done, **protocol_kwargs)
+    # TODO: do something about protocol&factory
+    # TODO: actually read it and pass to protocol.proc_err if defined.
+    # TODO: thread
+    stderr_out, self._stderr_out_fname = tempfile.mkstemp()
     kwargs.update(
         stdin=stdin,
         # ask the protocol which streams to capture
-        stdout=asyncio.subprocess.PIPE if protocol.proc_out else None,
-        stderr=asyncio.subprocess.PIPE if protocol.proc_err else None,
+        stdout=subprocess.PIPE if protocol.proc_out else None,
+        stderr=stderr_out,
     )
-    if isinstance(cmd, str):
-        proc = loop.subprocess_shell(factory, cmd, **kwargs)
-    else:
-        proc = loop.subprocess_exec(factory, *cmd, **kwargs)
-    transport = None
+    proc = subprocess.Popen(
+        cmd,
+        stdin=stdin,
+        shell=isinstance(cmd, str),
+        bufsize=1,
+        universal_newlines=True,
+        **kwargs
+    )
+    def noop_done(*args, **wargs):
+        print(f"I pretend to be done future with {args} {kwargs}")
+    transport = WitlessTransport(proc)
+    protocol_ = protocol(noop_done)
+    protocol.connection_made(transport)
     result = None
     try:
-        lgr.debug('Launching process %s', cmd)
-        transport, protocol = await proc
-        lgr.debug('Waiting for process %i to complete', transport.get_pid())
-        # The next wait is a workaround that avoids losing the output of
-        # quickly exiting commands (https://bugs.python.org/issue41594).
-        await asyncio.ensure_future(transport._wait())
-        await cmd_done
+        # lgr.debug('Launching process %s', cmd)
+        # transport, protocol = await proc
+        # lgr.debug('Waiting for process %i to complete', transport.get_pid())
+        # # The next wait is a workaround that avoids losing the output of
+        # # quickly exiting commands (https://bugs.python.org/issue41594).
+        # await asyncio.ensure_future(transport._wait())
+        # await cmd_done
+        ex = proc.poll()
         result = protocol._prepare_result()
     finally:
         # protect against a crash whe launching the process
@@ -117,7 +130,24 @@ async def run_async_cmd(loop, cmd, protocol, stdin, protocol_kwargs=None,
     return result
 
 
-class WitlessProtocol(asyncio.SubprocessProtocol):
+# TODO We need to orchestrate providing the transport etc
+# .connection_made(transport)
+
+# From transport we want
+# - .get_returncode()
+# - .get_pid()
+# so smells like we pretty much need _check_process
+
+class WitlessTransport():
+    def __init__(self, proc):
+        self._proc = proc
+    def get_returncode(self):
+        return self._proc.returncode  # poll()
+    def get_pid(self):
+        return self._proc.pid
+
+
+class WitlessProtocol(object): # asyncio asyncio.SubprocessProtocol):
     """Subprocess communication protocol base class for `run_async_cmd`
 
     This class implements basic subprocess output handling. Derived classes
