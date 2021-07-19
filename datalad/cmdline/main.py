@@ -36,7 +36,7 @@ from ..utils import (
 from .helpers import (
     ArgumentParserDisableAbbrev,
     _fix_datalad_ri,
-    _maybe_get_interface_subparser,
+    _get_interface_subparser,
     _maybe_get_single_subparser,
     _parse_overrides_from_cmdline,
     get_description_with_cmd_summary,
@@ -80,6 +80,7 @@ def setup_parser(
         dedent_docstring,
         get_cmdline_command_name,
         get_interface_groups,
+        load_interface,
     )
 
     # setup cmdline args parser
@@ -127,8 +128,11 @@ def setup_parser(
             cmd_name = get_cmdline_command_name(_intfspec)
             if single_subparser and cmd_name != single_subparser:
                 continue
-            subparser = _maybe_get_interface_subparser(
-                _intfspec, subparsers, cmd_name, formatter_class, group_name,
+            _intf = load_interface(_intfspec)
+            if _intf is None:  # failed to load
+                continue
+            subparser = _get_interface_subparser(
+                _intf, subparsers, cmd_name, formatter_class, group_name,
                 grp_short_descriptions
             )
             if subparser:  # interface might have failed to "load"

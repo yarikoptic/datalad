@@ -493,7 +493,7 @@ def _maybe_get_single_subparser(cmdlineargs, parser, interface_groups,
     return need_single_subparser
 
 
-def _maybe_get_interface_subparser(_intfspec, subparsers, cmd_name, formatter_class, group_name,
+def _get_interface_subparser(_intf, subparsers, cmd_name, formatter_class, group_name,
                                    grp_short_descriptions):
     """Given an interface spec, add a subparser to subparsers under cmd_name
 
@@ -503,11 +503,7 @@ def _maybe_get_interface_subparser(_intfspec, subparsers, cmd_name, formatter_cl
         alter_interface_docs_for_cmdline,
         get_cmd_doc,
         get_cmd_ex,
-        load_interface,
     )
-    _intf = load_interface(_intfspec)
-    if _intf is None:  # failed to load
-        return
     # deal with optional parser args
     if hasattr(_intf, 'parser_args'):
         parser_args = _intf.parser_args
@@ -540,6 +536,21 @@ def _maybe_get_interface_subparser(_intfspec, subparsers, cmd_name, formatter_cl
     sdescr = getattr(_intf, 'short_description',
                      parser_args['description'].split('\n')[0])
     grp_short_descriptions[group_name].append((cmd_name, sdescr))
+
+    # Handle sub-commands parsers
+    # TODO: if any defined -- there must have been no positional args in this one
+    sub_interfaces = getattr(_intf._subinterfaces_, [])
+
+    if sub_interfaces:
+        sub_subparsers = subparser.add_subparsers()
+    for sub_intf in sub_interfaces:
+        _i = _get_interface_subparser(
+            sub_intf, sub_subparsers, sub_intf.__name__.lower(),
+            formatter_class,
+            # TODO: see what we should do abut them
+            group_name, grp_short_descriptions
+        )
+
     return subparser
 
 

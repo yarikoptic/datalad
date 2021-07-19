@@ -194,6 +194,13 @@ class Siblings(Interface):
         recursive=recursion_flag,
         recursion_limit=recursion_limit)
 
+    _subinterfaces_ = []
+
+    @classmethod
+    def add_subinterface(cls, cls2):
+        # TODO: Python
+        cls._subinterfaces_ = cls._subinterfaces_ + [cls2]
+
     @staticmethod
     @datasetmethod(name='siblings')
     @eval_results
@@ -883,3 +890,12 @@ class _DelayedSuper(object):
     @property
     def repo(self):
         return self.super.repo if self.super else None
+
+
+@build_doc
+class Query(Interface):
+    _params_ = dict()
+    def __call__(self, ... lots of params from super interface?? hm...):
+        return _query_remotes(...)
+
+Siblings.add_subinterface(Query)  # TODO: make it more sensible, may be via metadata class etc
