@@ -353,6 +353,20 @@ class HTTPAuthAuthenticator(HTTPRequestsAuthenticator):
         response = session.post(post_url, data={},
                                 auth=authenticator)
         auth_request = response.headers.get('www-authenticate')
+        if response.status_code in (401, 403, 404) and not auth_request:
+                lgr.debug(
+                    'Initial POST with credentials, resulted in %s and did not provide www-authenticate',
+                    response.status_code
+                )
+                # we provide authentication detail "pro-actively" above, but some providers
+                # might not provide www-authenticate if initial request provided .  See
+                # https://github.com/datalad/datalad/issues/5846
+                session.auth = None
+                response_ = session.post(post_url, data={})
+                auth_request_ = response.headers.get('www-authenticate')
+                if auth_request_:  # favor 2nd iff it was the one providing www-authenticate
+                    auth_request = auth_request_
+                    response = response_
         if response.status_code == 401 and auth_request:
             if auth_request.lower().split(' ', 1)[0] == 'basic':
                 if response.url != post_url:
