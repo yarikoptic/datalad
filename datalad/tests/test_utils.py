@@ -1195,8 +1195,10 @@ def test_get_open_files(p):
         # since lsof does not care about PWD env var etc, paths
         # will not contain symlinks, we better realpath them
         # all before comparison
-        eq_(get_open_files(p, log_open=40)[str(f1.resolve())].pid,
-            os.getpid())
+        f1_resolved = str(f1.resolve())
+        open_files = get_open_files(p, log_open=40)
+        assert_in(f1_resolved, open_files)
+        eq_(open_files[f1_resolved].pid, os.getpid())
 
     assert not get_open_files(str(subd))
 
