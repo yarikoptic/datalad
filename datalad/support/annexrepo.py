@@ -299,9 +299,6 @@ class AnnexRepo(GitRepo, RepoInterface):
         if backend:
             self.set_default_backend(backend, persistent=True)
 
-        if self._ALLOW_LOCAL_URLS:
-            self._allow_local_urls()
-
         # will be evaluated lazily
         self._n_auto_jobs = None
 
@@ -895,6 +892,10 @@ class AnnexRepo(GitRepo, RepoInterface):
         """
         if self.git_annex_version is None:
             self._check_git_annex_version()
+            # also possibly and delayed (why bother if not needed) set additional
+            # configs to the dataset,
+            if self._ALLOW_LOCAL_URLS:
+                self._allow_local_urls()
 
         # git portion of the command
         cmd = ['git'] + self._ANNEX_GIT_COMMON_OPTIONS
