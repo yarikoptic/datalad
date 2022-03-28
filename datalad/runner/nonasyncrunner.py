@@ -121,6 +121,38 @@ class _ResultGenerator(Generator):
         return Generator.throw(self, exception_type, value, trace_back)
 
 
+def ensure_nomulti_thread(cls):
+    """Note that we do nothing for __init__ so there could still be
+    a case where __init__'ed in one thread, and only then used in another
+    """
+    import threading
+
+    orig_ga = cls.__getattribute__
+    thread_attr = '_X_init_thread_id'
+
+    def ensure_(self, attr):
+        if attr == thread_attr:
+            return orig_ga(self, attr)
+
+        # both IDs, needs py 3.8 for the native id
+        tid = (threading.get_ident(), threading.get_native_id())
+        otid = getattr(self, thread_attr, None)
+
+        if not otid:
+            # print(f"HERE  of {self}.{attr}")
+            setattr(self, thread_attr, tid)
+        else:
+            #print(f"CHECK of {self}.{attr} {tid}")
+            if otid != tid:
+                import pdb; pdb.set_trace()
+                pass
+        return orig_ga(self, attr)
+
+    cls.__getattribute__ = ensure_
+    return cls
+
+
+@ensure_nomulti_thread
 class ThreadedRunner:
     """
     A class the contains a naive implementation for concurrent sub-process
