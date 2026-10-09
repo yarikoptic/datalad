@@ -109,6 +109,25 @@ are also altered to exclude Python-specific idioms that have no relevance
 on the command line (e.g., the specification of ``None`` as a default).
 
 
+Shell completion of parameter values
+====================================
+
+Shell completion is implemented with ``argcomplete`` (see
+``datalad shell-completion``). When invoked for completion, the parser is
+constructed without any help texts, and parameter values are completed
+according to
+
+- the choices of an ``EnsureChoice`` constraint, or
+
+- the ``completer`` of a :class:`~datalad.support.param.Parameter`: either
+  the name of a completer in ``datalad.cli.completers`` (e.g., ``'siblings'``
+  for the names of the siblings of the dataset identified via ``-C``,
+  ``-d/--dataset``, or the working directory), or a callable following the
+  ``argcomplete`` completer protocol.
+
+Without either, ``argcomplete`` falls back on file name completion.
+
+
 CLI-based execution of ``Interface`` command
 ============================================
 

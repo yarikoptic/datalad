@@ -226,17 +226,28 @@ as_common_datasrc = Parameter(
     dataset (technical: git-annex auto-enabled special remote)""")
 
 
+# Common keyword arguments for any Parameter that takes the name of an
+# existing sibling, as in `Parameter(args=..., doc=..., **sibling_name_kwargs)`.
+# Not a Parameter of its own, since option names and docs differ between
+# commands (e.g. `push --to`, `update --sibling`), but this ensures the
+# same metavar and shell completion of the dataset's sibling names.
+sibling_name_kwargs = dict(
+    metavar='SIBLING',
+    completer='siblings',
+    constraints=EnsureStr() | EnsureNone(),
+)
+
 publish_depends = Parameter(
     args=("--publish-depends",),
-    metavar='SIBLINGNAME',
     doc="""add a dependency such that the given existing sibling is
     always published prior to the new sibling. This equals setting a
-    configuration item 'remote.SIBLINGNAME.datalad-publish-depends'.
+    configuration item 'remote.<name>.datalad-publish-depends' of the new
+    sibling.
     [PY: Multiple dependencies can be given as a list of sibling names
     PY][CMD: This option can be given more than once to configure multiple
     dependencies CMD]""",
     action='append',
-    constraints=EnsureStr() | EnsureNone())
+    **sibling_name_kwargs)
 
 publish_by_default = Parameter(
     args=("--publish-by-default",),

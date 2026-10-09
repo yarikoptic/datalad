@@ -40,6 +40,7 @@ from datalad.interface.common_opts import (
     publish_depends,
     recursion_flag,
     recursion_limit,
+    sibling_name_kwargs,
 )
 from datalad.interface.results import get_status_dict
 from datalad.interface.utils import generic_result_renderer
@@ -139,12 +140,11 @@ class Siblings(Interface):
             constraints=EnsureDataset() | EnsureNone()),
         name=Parameter(
             args=('-s', '--name',),
-            metavar='NAME',
             doc="""name of the sibling. For addition with path "URLs" and
             sibling removal this option is mandatory, otherwise the hostname
             part of a given URL is used as a default. This option can be used
             to limit 'query' to a specific sibling.""",
-            constraints=EnsureStr() | EnsureNone()),
+            **sibling_name_kwargs),
         action=Parameter(
             args=('action',),
             nargs='?',

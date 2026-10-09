@@ -7,10 +7,13 @@ from unittest.mock import patch
 
 from datalad.tests.utils_pytest import (
     assert_equal,
+    assert_false,
     assert_in,
+    assert_is,
     assert_raises,
 )
 
+from ..completers import complete_siblings
 from ..parser import (
     fail_with_short_help,
     setup_parser,
@@ -80,3 +83,15 @@ def test_setup():
         list(parser._positionals._group_actions[0].choices.keys()),
         ['wtf']
     )
+
+
+def test_setup_completer():
+    def get_to_action(completing):
+        parser = setup_parser(['datalad', 'push'], completing=completing)
+        subparser = parser._positionals._group_actions[0].choices['push']
+        return [a for a in subparser._actions if '--to' in a.option_strings][0]
+
+    # completers are only attached when completing
+    assert_false(hasattr(get_to_action(False), 'completer'))
+    assert_is(get_to_action(True).completer, complete_siblings)
+    assert_equal(get_to_action(True).metavar, 'SIBLING')

@@ -278,8 +278,11 @@ def setup_parserarg_for_interface(parser, param_name, param, defaults_idx,
             defaults[defaults_idx] if defaults_idx >= 0 else None)
     # create the parameter, using the constraint instance for type
     # conversion
-    parser.add_argument(*parser_args, help=help,
-                        **parser_kwargs)
+    action = parser.add_argument(*parser_args, help=help,
+                                 **parser_kwargs)
+    if completing and param.completer is not None:
+        from .completers import get_completer
+        action.completer = get_completer(param.completer)
 
 
 def _amend_param_parser_kwargs_for_help(parser_kwargs, param, default=None):

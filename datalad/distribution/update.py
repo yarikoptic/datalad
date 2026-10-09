@@ -28,6 +28,7 @@ from datalad.interface.common_opts import (
     recursion_flag,
     recursion_limit,
     save_message_opt,
+    sibling_name_kwargs,
 )
 from datalad.interface.results import (
     YieldDatasets,
@@ -141,7 +142,7 @@ class Update(Interface):
             requested via [CMD: --merge, --how, or --how-subds CMD][PY:
             `merge`, `how`, or `how_subds` PY]), a sibling will be chosen based
             on the configured remote for the current branch.""",
-            constraints=EnsureStr() | EnsureNone()),
+            **sibling_name_kwargs),
         dataset=Parameter(
             args=("-d", "--dataset"),
             doc="""specify the dataset to update.  If

@@ -29,6 +29,7 @@ from datalad.interface.base import (
     build_doc,
     eval_results,
 )
+from datalad.interface.common_opts import sibling_name_kwargs
 from datalad.interface.results import get_status_dict
 from datalad.log import log_progress
 from datalad.support.constraints import (
@@ -78,10 +79,9 @@ class ExportArchiveORA(Interface):
         remote=Parameter(
             args=("--for",),
             dest="remote",
-            metavar='LABEL',
             doc="""name of the target sibling, wanted/preferred settings
             will be used to filter the files added to the archives""",
-            constraints=EnsureStr() | EnsureNone()),
+            **sibling_name_kwargs),
         annex_wanted=Parameter(
             args=("--annex-wanted",),
             metavar="FILTERS",
